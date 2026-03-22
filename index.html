@@ -3,20 +3,18 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>SaPA • Satu Peta Anabul | NgePaw Ranger</title>
+<title>SaPA • Satu Peta Anabul</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
 <style>
 /* ── VARIABEL & RESET ── */
-:root {
-  --orange: #F26522; --orange-l: #F5874F; --orange-bg: #FFF8F6;
-  --blue: #42C0FB; --green: #25D366; --navy: #1a2340; --dark: #1A1A1A;
-  --gold: #FFD700; --mint: #3EB489;
-  --muted: #888; --border: #EEEEEE; --white: #FFFFFF; --radius: 18px;
-}
+:root { --orange: #F26522; --blue: #42C0FB; --green: #25D366; --navy: #1a2340; --dark: #1A1A1A; --gold: #FFD700; --mint: #3EB489; --muted: #888; --border: #EEEEEE; --white: #FFFFFF; --radius: 18px; }
 * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; font-family:'Nunito',sans-serif; }
 body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
 
@@ -26,19 +24,18 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
 .screen.active { display:block; animation: fadeIn 0.3s ease-out; }
 .container { max-width:500px; margin:0 auto; background:var(--white); min-height:100vh; position:relative; box-shadow:0 0 30px rgba(0,0,0,0.06); }
 
-/* ── HEADER V4 ── */
+/* ── HEADER & TOP BAR ── */
 .app-header { background:linear-gradient(135deg, var(--navy), #0f1a2e); color:var(--white); text-align:center; padding:28px 20px 24px; border-bottom-left-radius:24px; border-bottom-right-radius:24px; }
 .header-logo-ring { width:80px; height:80px; margin:0 auto 12px; background:var(--white); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.25); font-size:40px; }
 .header-title { font-size:20px; font-weight:900; }
 .header-title span { color:var(--orange); }
 .lebaran-pill { display:inline-block; background:rgba(255,215,0,0.15); border:1px solid rgba(255,215,0,0.3); padding:4px 12px; border-radius:20px; font-size:11px; font-weight:800; color:var(--gold); margin-top:8px; }
 
-/* ── TOP BAR ── */
 .top-bar { padding:16px 18px; display:flex; align-items:center; gap:14px; background:var(--white); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:1000; }
 .top-bar h2 { font-size:18px; font-weight:900; color:var(--navy); flex:1; }
-.btn-back { width:40px; height:40px; border-radius:12px; border:none; background:var(--orange-bg); color:var(--orange); font-size:22px; font-weight:900; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.btn-back { width:40px; height:40px; border-radius:12px; border:none; background:#FFF8F6; color:var(--orange); font-size:22px; font-weight:900; display:flex; align-items:center; justify-content:center; cursor:pointer; }
 
-/* ── STATS & MENU GRID (HOME) ── */
+/* ── UI COMPONENTS ── */
 .stats-strip { display:grid; grid-template-columns:repeat(4,1fr); background:white; border-bottom:1px solid var(--border); }
 .stat-item { text-align:center; padding:12px 4px; border-right:1px solid var(--border); cursor:pointer; }
 .stat-val { font-size:20px; font-weight:900; }
@@ -51,12 +48,10 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
 .card-icon { font-size:32px; margin-bottom:8px; }
 .card-title { font-size:14px; font-weight:800; margin-bottom:4px; color:var(--navy); }
 .primary .card-title { color:white; }
-.card-desc { font-size:11px; color:var(--muted); margin-bottom:12px; line-height:1.4; }
-.primary .card-desc { color:rgba(255,255,255,0.8); }
 .card-btn { background:#f5f5f5; color:var(--navy); border:none; padding:8px; border-radius:10px; font-size:11px; font-weight:800; width:100%; pointer-events:none; }
 .primary .card-btn { background:rgba(255,255,255,0.2); color:white; }
 
-/* ── PETA & FILTER ── */
+/* Map, List & Timeline */
 #map { height:360px; width:100%; border-bottom:1px solid var(--border); z-index:1; }
 .chip-row { display:flex; gap:8px; padding:12px 15px; overflow-x:auto; background:var(--white); border-bottom:1px solid var(--border); scrollbar-width:none; }
 .chip-row::-webkit-scrollbar { display:none; }
@@ -67,11 +62,8 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
 .marker-hilang { background: var(--orange); }
 .marker-ditemukan { background: var(--blue); }
 
-/* ── LIST VIEW & TIMELINE ── */
 .list-item { background:white; border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; display:flex; gap:12px; align-items:center; cursor:pointer; transition:0.2s; }
-.list-item:active { transform:scale(0.98); }
 .list-emoji { font-size:30px; background:#f9f9f9; width:50px; height:50px; display:flex; align-items:center; justify-content:center; border-radius:12px; }
-.tag { padding:3px 8px; border-radius:6px; font-size:10px; font-weight:800; display:inline-block; }
 
 .timeline { border-left: 2px solid var(--border); margin: 20px 0 0 10px; padding-left: 20px; }
 .timeline-item { position: relative; margin-bottom: 20px; }
@@ -81,19 +73,10 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
 .timeline-time { font-size: 11px; color: var(--muted); font-weight: 800; margin-bottom: 2px; }
 .timeline-text { font-size: 13px; color: var(--navy); line-height: 1.4; }
 
-/* ── POIN & REWARD ── */
-.poin-hero { background: linear-gradient(135deg, var(--navy), #2d3f6b); padding: 24px 18px; color: white; text-align:center; }
-.poin-total { font-size: 40px; font-weight: 900; color:var(--gold); }
-.poin-tab-row { display:flex; background:white; border-bottom:1px solid var(--border); }
-.poin-tab { flex:1; text-align:center; padding:12px; font-size:13px; font-weight:800; color:var(--muted); cursor:pointer; border-bottom:3px solid transparent; }
-.poin-tab.active { color:var(--orange); border-bottom-color:var(--orange); }
-.reward-card { background:white; border:1px solid var(--border); border-radius:14px; padding:15px; margin-bottom:10px; display:flex; align-items:center; gap:12px; cursor:pointer;}
-.reward-card:active { transform:scale(0.97); }
-
-/* ── FORMS & UTILS ── */
+/* Forms */
 .form-group { margin-bottom:16px; padding:0 18px;}
 .form-group label { display:block; font-weight:800; font-size:13px; margin-bottom:7px; color:var(--navy); }
-.f-input { width:100%; padding:14px; border:1.5px solid var(--border); border-radius:12px; font-size:14px; background:#f9f9f9; outline:none; font-family:'Nunito',sans-serif; }
+.f-input { width:100%; padding:14px; border:1.5px solid var(--border); border-radius:12px; font-size:14px; background:#f9f9f9; outline:none; }
 .f-input:focus { border-color:var(--orange); background:white; }
 .btn-primary { background:var(--orange); color:white; border:none; padding:16px; border-radius:var(--radius); width:100%; font-size:15px; font-weight:800; cursor:pointer; margin-top:10px; transition:0.2s; }
 .btn-primary:active { transform:scale(0.97); }
@@ -117,41 +100,22 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
       <div class="header-logo-ring">🐾</div>
       <div class="header-title">Satu Peta <span>Anabul</span></div>
       <div class="lebaran-pill">✨ NgePaw Ranger</div>
-      <div style="font-size:12px; color:rgba(255,255,255,0.7); margin-top:10px; font-weight:700;">Healthy Owner, Happy Anabul</div>
+      <div style="font-size:12px; color:rgba(255,255,255,0.7); margin-top:10px; font-weight:700;">Database: <span id="db-status" style="color:#25D366">Menghubungkan...</span></div>
     </div>
 
     <div class="stats-strip">
-      <div class="stat-item"><div class="stat-val" style="color:var(--orange)">12</div><div class="stat-lbl">Anabul</div></div>
-      <div class="stat-item" onclick="showScreen('scr-klinik')"><div class="stat-val" style="color:var(--blue)">5</div><div class="stat-lbl">Klinik</div></div>
-      <div class="stat-item" onclick="showScreen('scr-komunitas')"><div class="stat-val" style="color:var(--mint)">8</div><div class="stat-lbl">Komunitas</div></div>
-      <div class="stat-item" onclick="showScreen('scr-poin')"><div class="stat-val" id="ui-poin" style="color:var(--gold)">1.240</div><div class="stat-lbl">Poinku 🏆</div></div>
+      <div class="stat-item"><div class="stat-val" id="ui-total-anabul" style="color:var(--orange)">0</div><div class="stat-lbl">Anabul</div></div>
+      <div class="stat-item"><div class="stat-val" style="color:var(--blue)">5</div><div class="stat-lbl">Klinik</div></div>
+      <div class="stat-item"><div class="stat-val" style="color:var(--mint)">8</div><div class="stat-lbl">Komunitas</div></div>
+      <div class="stat-item"><div class="stat-val" style="color:var(--gold)">1.240</div><div class="stat-lbl">Poinku 🏆</div></div>
     </div>
 
     <div class="menu-grid">
       <div class="menu-card primary" onclick="showScreen('scr-peta')">
-        <div class="card-icon">🗺️</div><div class="card-title">Peta Anabul</div>
-        <div class="card-desc">Pantau sebaran anabul jalanan di sekitarmu secara real-time.</div>
-        <button class="card-btn">Buka Peta</button>
+        <div class="card-icon">🗺️</div><div class="card-title">Peta Anabul</div><button class="card-btn">Buka Peta Live</button>
       </div>
       <div class="menu-card" onclick="showScreen('scr-lapor')">
-        <div class="card-icon">🚨</div><div class="card-title">Lapor Cepat</div>
-        <div class="card-desc">Temukan anabul butuh bantuan? Lapor sekarang.</div>
-        <button class="card-btn">Kamera Ranger</button>
-      </div>
-      <div class="menu-card" onclick="showScreen('scr-lf')">
-        <div class="card-icon">🔍</div><div class="card-title">Lost & Found</div>
-        <div class="card-desc">Bantu cari anabul hilang atau ditemukan.</div>
-        <button class="card-btn">Daftar Laporan</button>
-      </div>
-      <div class="menu-card" onclick="showScreen('scr-klinik')" style="border-color:var(--blue);">
-        <div class="card-icon">🏥</div><div class="card-title">Klinik & Medis</div>
-        <div class="card-desc">Cari klinik terdekat & partner medis strategis SaPA.</div>
-        <button class="card-btn" style="background:var(--blue); color:white;">Buka Katalog</button>
-      </div>
-      <div class="menu-card" onclick="showScreen('scr-komunitas')" style="border-color:var(--mint);">
-        <div class="card-icon">🤝</div><div class="card-title">Komunitas</div>
-        <div class="card-desc">Adopsi, foster, dan donasi untuk anabul.</div>
-        <button class="card-btn" style="background:var(--mint); color:white;">Lihat Forum</button>
+        <div class="card-icon">🚨</div><div class="card-title">Lapor Cepat</div><button class="card-btn">Kamera Ranger</button>
       </div>
     </div>
   </div>
@@ -159,7 +123,7 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
   <div id="scr-peta" class="screen">
     <div class="top-bar">
       <button class="btn-back" onclick="showScreen('scr-home')">←</button>
-      <h2>Peta Ranger</h2>
+      <h2>Peta Ranger Live</h2>
     </div>
     <div class="chip-row">
       <div class="chip on" onclick="terapkanFilter('all', this)">📍 Semua</div>
@@ -169,15 +133,15 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
     </div>
     <div id="map"></div>
     <div style="padding: 15px;">
-      <h3 style="font-weight: 800; font-size: 15px; margin-bottom:10px; color:var(--navy);">Daftar Pantauan Terkini</h3>
-      <div id="anabul-list"></div>
+      <h3 style="font-weight: 800; font-size: 15px; margin-bottom:10px; color:var(--navy);">Daftar Pantauan Firebase</h3>
+      <div id="anabul-list"><i>Memuat data dari satelit...</i></div>
     </div>
   </div>
 
   <div id="scr-lapor" class="screen">
     <div class="top-bar">
       <button class="btn-back" onclick="showScreen('scr-home')">←</button>
-      <h2>Lapor Anabul</h2>
+      <h2>Lapor Anabul Baru</h2>
     </div>
     <div style="padding-top:20px;">
       <div class="form-group">
@@ -189,25 +153,17 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
         <input type="file" id="input-cam" accept="image/*" capture="environment" style="display:none;" onchange="handleNativePhoto(this)">
       </div>
       <div class="form-group">
-        <label>Nama Anabul / Kondisi Singkat</label>
+        <label>Nama / Kondisi Singkat</label>
         <input type="text" id="inp-nama" class="f-input" placeholder="Contoh: Kucing Luka di Margonda">
       </div>
       <div class="form-group">
         <label>Lokasi / Patokan</label>
-        <input type="text" id="inp-lokasi" class="f-input" placeholder="Contoh: Depan Indomaret Margonda Raya">
+        <input type="text" id="inp-lokasi" class="f-input" placeholder="Contoh: Depan Indomaret">
       </div>
       <div class="form-group">
-        <button class="btn-primary" onclick="simpanLaporanBaru()">Kirim Laporan & Dapat Poin 🐾</button>
+        <button class="btn-primary" onclick="simpanLaporanBaru()">Kirim Laporan ke Database 🐾</button>
       </div>
     </div>
-  </div>
-
-  <div id="scr-lf" class="screen">
-    <div class="top-bar">
-      <button class="btn-back" onclick="showScreen('scr-home')">←</button>
-      <h2>Lost & Found</h2>
-    </div>
-    <div style="padding: 15px;" id="lf-list"></div>
   </div>
 
   <div id="scr-detail" class="screen">
@@ -217,14 +173,12 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
     </div>
     <div style="padding: 20px;">
       <div style="text-align: center; margin-bottom: 20px; background:white; padding:20px; border-radius:16px; border:1px solid var(--border);">
-        <div style="font-size: 60px; margin-bottom: 10px;" id="det-img">😿</div>
+        <div style="font-size: 60px; margin-bottom: 10px;" id="det-img">🚨</div>
         <h3 style="font-weight: 900; color: var(--navy); font-size: 20px;" id="det-nama">Nama</h3>
         <p style="font-size: 13px; color: var(--muted); margin-top:5px;" id="det-lokasi">📍 Lokasi</p>
-        <button class="btn-primary" id="det-wa" style="background:var(--green); padding:12px; margin-top:15px; font-size:14px; width:auto; padding-left:20px; padding-right:20px;">💬 Hubungi Pelapor</button>
       </div>
-      <button class="btn-primary" style="margin-top:0; background:white; color:var(--orange); border:2px solid var(--orange);" onclick="showScreen('scr-update')">📝 + Update Kondisi</button>
-      
-      <h4 style="font-weight: 800; color: var(--navy); font-size: 15px; margin-top:25px;">Riwayat Pantauan</h4>
+      <button class="btn-primary" style="margin-top:0; background:white; color:var(--orange); border:2px solid var(--orange);" onclick="showScreen('scr-update')">📝 + Update Kondisi Real-time</button>
+      <h4 style="font-weight: 800; color: var(--navy); font-size: 15px; margin-top:25px;">Riwayat Pantauan Database</h4>
       <div class="timeline" id="timeline-container"></div>
     </div>
   </div>
@@ -240,12 +194,12 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
         <select id="upd-status" class="f-input">
           <option value="terlihat">👀 Masih terlihat / Ada di lokasi</option>
           <option value="hilang">❌ Tidak ditemukan / Pindah tempat</option>
-          <option value="aman">✅ Sudah aman / Diselamatkan</option>
+          <option value="ditemukan">✅ Sudah aman / Diselamatkan</option>
         </select>
       </div>
       <div class="form-group">
         <label>Catatan Tambahan (Wajib)</label>
-        <textarea id="upd-catatan" class="f-input" rows="3" placeholder="Contoh: Saya sudah ke lokasi, tapi anabul tidak ada..."></textarea>
+        <textarea id="upd-catatan" class="f-input" rows="3" placeholder="Contoh: Saya sudah ke lokasi, anabul aman..."></textarea>
       </div>
       <div class="form-group">
         <button class="btn-primary" onclick="simpanUpdate()">Kirim Update (+10 Poin)</button>
@@ -253,136 +207,91 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
     </div>
   </div>
 
-  <div id="scr-klinik" class="screen">
-    <div class="top-bar"><button class="btn-back" onclick="showScreen('scr-home')">←</button><h2>Klinik Partner</h2></div>
-    <div style="padding:15px;" id="klinik-list"></div>
-  </div>
-  <div id="scr-komunitas" class="screen">
-    <div class="top-bar"><button class="btn-back" onclick="showScreen('scr-home')">←</button><h2>Komunitas SaPA</h2></div>
-    <div style="padding:15px;" id="komunitas-list"></div>
-  </div>
-
-  <div id="scr-poin" class="screen">
-    <div class="top-bar"><button class="btn-back" onclick="showScreen('scr-home')">←</button><h2>Poin Ranger</h2></div>
-    <div class="poin-hero">
-      <div style="font-size:12px; font-weight:700; opacity:0.8;">Total Poin Tersedia</div>
-      <div class="poin-total" id="ui-poin-big">1.240</div>
-      <div style="background:rgba(255,255,255,0.2); display:inline-block; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:800; margin-top:5px;">🏅 Ranger Level 3</div>
-    </div>
-    <div class="poin-tab-row">
-      <div class="poin-tab active" onclick="switchPoinTab('reward', this)">🎁 Reward</div>
-      <div class="poin-tab" onclick="switchPoinTab('aktivitas', this)">📋 Cara Dapat Poin</div>
-    </div>
-    <div id="tab-reward" style="padding:15px;">
-      <div class="reward-card" onclick="klaimReward('SAPA-GLOW-01')">
-        <div style="font-size:35px;">💅</div>
-        <div style="flex:1;">
-          <div style="font-size:13px; font-weight:800; color:var(--navy);">Diskon 15% KeishaGlow</div>
-          <div style="font-size:11px; color:var(--muted); margin-top:2px;">Sponsor: KeishaGlow Jakarta</div>
-        </div>
-        <div style="background:var(--orange-bg); color:var(--orange); padding:6px 10px; border-radius:10px; font-size:12px; font-weight:900;">50 Poin</div>
-      </div>
-    </div>
-    <div id="tab-aktivitas" style="display:none; padding:15px;">
-      <div class="list-item"><div class="list-emoji" style="font-size:20px;">📸</div><div style="flex:1;"><div style="font-weight:800; font-size:13px;">Lapor Anabul Baru</div><div style="font-size:11px; color:var(--muted);">Dengan foto dari kamera.</div></div><div style="font-weight:900; color:var(--orange);">+20 Poin</div></div>
-      <div class="list-item"><div class="list-emoji" style="font-size:20px;">📝</div><div style="flex:1;"><div style="font-weight:800; font-size:13px;">Update Kondisi</div><div style="font-size:11px; color:var(--muted);">Memberi pantauan terbaru.</div></div><div style="font-weight:900; color:var(--orange);">+10 Poin</div></div>
-    </div>
-  </div>
-
   <div id="toast">Notifikasi</div>
-
   <div id="bottom-nav">
     <div class="nav-item active" onclick="showScreen('scr-home')"><span class="ni">🏠</span>Beranda</div>
     <div class="nav-item" onclick="showScreen('scr-peta')"><span class="ni">🗺️</span>Peta</div>
     <div class="nav-item" onclick="showScreen('scr-lapor')"><span class="ni">📸</span>Lapor</div>
-    <div class="nav-item" onclick="showScreen('scr-poin')"><span class="ni">🏆</span>Poin</div>
   </div>
-
 </div>
 
 <script>
-/* --- FUNGSI TOAST --- */
-let toastTimeout;
-function showToast(msg) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.classList.add('show');
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => toast.classList.remove('show'), 2500);
-}
+/* =========================================================
+   🔥 1. KONFIGURASI FIREBASE ANDA (PASTE DI SINI!) 🔥
+   ========================================================= */
+const firebaseConfig = {
+  // 👇 PASTE KODE DARI GAMBAR ANDA DI BAWAH INI 👇
+  const firebaseConfig = {
+  apiKey: "AIzaSyCj_aZOIOuiZEM7LsDTEtU3Ri_kqcQ-Mtk",
+  authDomain: "sapa-database-96958.firebaseapp.com",
+  projectId: "sapa-database-96958",
+  storageBucket: "sapa-database-96958.firebasestorage.app",
+  messagingSenderId: "613533167320",
+  appId: "1:613533167320:web:c6730a0cb1dd63e35631ad",
+};
 
-/* --- SISTEM POIN --- */
-let myPoin = 1240;
-function updatePoinUI() {
-  document.getElementById('ui-poin').textContent = myPoin.toLocaleString('id');
-  document.getElementById('ui-poin-big').textContent = myPoin.toLocaleString('id');
-}
-function addPoin(amount, reason) {
-  myPoin += amount;
-  updatePoinUI();
-  showToast(`Berhasil! +${amount} Poin (${reason}) 🏆`);
-}
-function klaimReward(code) {
-  if(myPoin >= 50) {
-    alert(`Berhasil klaim! Tunjukkan KODE REFERRAL ini ke kasir: ${code}`);
-    myPoin -= 50; updatePoinUI();
-  } else { showToast("Poin tidak cukup!"); }
-}
-function switchPoinTab(tabId, el) {
-  document.querySelectorAll('.poin-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('tab-reward').style.display = tabId === 'reward' ? 'block' : 'none';
-  document.getElementById('tab-aktivitas').style.display = tabId === 'aktivitas' ? 'block' : 'none';
-}
+  // 👆 PASTE KODE DARI GAMBAR ANDA DI ATAS INI 👆
+};
 
-/* --- DATA DATABASE DUMMY --- */
-let dbData = [
-  { id: 1, nama: "Mimi (Kucing)", status: "hilang", emoji: "😿", lat: -6.2050, lng: 106.8120, lokasi: "Cilodong, Depok", wa: "628123456789", updates: [{ waktu: "10:00 WIB", user: "Pelapor Awal", teks: "Mimi lepas dari rumah.", tipe: "terlihat" }] },
-  { id: 2, nama: "Anjing Luka Darurat", status: "darurat", emoji: "🐕", lat: -6.2150, lng: 106.8100, lokasi: "Margonda Raya", wa: "6289988776655", updates: [{ waktu: "15:30 WIB", user: "Budi", teks: "Pincang di depan minimarket.", tipe: "terlihat" }] }
-];
+// Inisialisasi Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-let klnData = [
-  { nama: "KeishaGlow Jakarta", desc: "Partner Strategis Estetika (Diskon 15% Ranger)", icon:"🏥", tag:"Partner", bg:"#e8f5e9", color:"#2e7d32" },
-  { nama: "Bvet Lampung", desc: "Laboratorium & Medis Veteriner", icon:"🔬", tag:"Medis", bg:"#e3f2fd", color:"#1976d2" }
-];
-
-let komData = [
-  { nama: "Butuh Foster Sementara", desc: "Kucing stray melahirkan butuh tempat aman 1 minggu.", icon:"🏡", tag:"Foster", bg:"#fff3e0", color:"#e65100" },
-  { nama: "Open Donasi Medis", desc: "Untuk anjing korban tabrak lari di Margonda.", icon:"💰", tag:"Donasi", bg:"#ffebee", color:"#c62828" }
-];
-
+/* =========================================================
+   🛠️ 2. VARIABEL & LOGIKA APLIKASI
+   ========================================================= */
+let dbData = []; // Data sekarang kosong, akan diisi otomatis oleh Firebase!
 let currentId = null;
+let currentFilter = 'all';
 
-/* --- LOGIKA NAVIGASI SPA HALUS --- */
+function showToast(msg) {
+  const toast = document.getElementById('toast'); toast.textContent = msg;
+  toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if(id === 'scr-home') document.querySelectorAll('.nav-item')[0].classList.add('active');
-  if(id === 'scr-peta' || id === 'scr-detail' || id === 'scr-update') { 
-      document.querySelectorAll('.nav-item')[1].classList.add('active'); 
-      if(map && id === 'scr-peta') setTimeout(()=>map.invalidateSize(),200); 
-  }
+  if(id === 'scr-peta' || id === 'scr-detail') { document.querySelectorAll('.nav-item')[1].classList.add('active'); if(map && id === 'scr-peta') setTimeout(()=>map.invalidateSize(),200); }
   if(id === 'scr-lapor') document.querySelectorAll('.nav-item')[2].classList.add('active');
-  if(id === 'scr-poin') document.querySelectorAll('.nav-item')[3].classList.add('active');
-  
-  if(id === 'scr-lf') renderList('lf-list', 'all');
-  if(id === 'scr-klinik') renderStatic(klnData, 'klinik-list');
-  if(id === 'scr-komunitas') renderStatic(komData, 'komunitas-list');
 }
 
-/* --- RENDER LIST --- */
-function renderList(containerId, filterStatus) {
-  const list = document.getElementById(containerId); list.innerHTML = "";
+/* --- LOGIKA PETA & RENDER --- */
+let map; let markerLayer;
+function initMap() {
+  if (map) return;
+  map = L.map('map', { zoomControl: false, preferCanvas: true }).setView([-6.3813, 106.8340], 14); // Kordinat Margonda/Depok
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  markerLayer = L.layerGroup().addTo(map);
+}
+
+function terapkanFilter(kategori, btnEl = null) {
+  if (btnEl) { document.querySelectorAll('.chip').forEach(btn => btn.classList.remove('on')); btnEl.classList.add('on'); }
+  currentFilter = kategori;
+  
+  if(!markerLayer) return;
+  markerLayer.clearLayers();
+  
+  const list = document.getElementById('anabul-list'); list.innerHTML = "";
+  
+  if(dbData.length === 0) { list.innerHTML = "<p style='color:#888; font-size:12px;'>Belum ada laporan di Firebase.</p>"; return; }
+
   dbData.forEach(item => {
-    if (filterStatus === 'all' || item.status === filterStatus) {
-      const lastUpd = item.updates[item.updates.length - 1];
+    if (kategori === 'all' || item.status === kategori) {
+      // 1. Gambar Marker di Peta
+      const icon = L.divIcon({ className: `custom-marker marker-${item.status}`, iconSize: [20, 20] });
+      L.marker([item.lat, item.lng], { icon: icon }).bindPopup(`<b>${item.nama}</b>`).addTo(markerLayer);
+      
+      // 2. Buat Daftar List
+      const lastUpd = item.updates && item.updates.length > 0 ? item.updates[item.updates.length - 1] : {teks: "Belum ada update"};
       let tagBg = item.status === 'darurat' ? '#ffebee' : (item.status === 'hilang' ? '#fff8f6' : '#e3f2fd');
       let tagColor = item.status === 'darurat' ? '#f44336' : (item.status === 'hilang' ? 'var(--orange)' : 'var(--blue)');
+      
       list.innerHTML += `
-        <div class="list-item" onclick="bukaDetail(${item.id})">
-          <div class="list-emoji">${item.emoji}</div>
+        <div class="list-item" onclick="bukaDetail('${item.id}')">
+          <div class="list-emoji">${item.emoji || '🐾'}</div>
           <div style="flex:1;">
             <div style="font-weight:800; font-size:14px; color:var(--navy);">${item.nama}</div>
             <div style="font-size:11px; color:var(--muted); margin-top:2px;">📍 ${item.lokasi}</div>
@@ -392,78 +301,120 @@ function renderList(containerId, filterStatus) {
     }
   });
 }
-function renderStatic(dataArr, containerId) {
-  const list = document.getElementById(containerId); list.innerHTML = "";
-  dataArr.forEach(d => {
-    list.innerHTML += `
-      <div class="list-item">
-        <div class="list-emoji">${d.icon}</div>
-        <div style="flex:1;">
-          <div style="font-weight:800; font-size:14px; color:var(--navy);">${d.nama}</div>
-          <div style="font-size:11px; color:var(--muted); margin-top:2px;">${d.desc}</div>
-          <span class="tag" style="background:${d.bg}; color:${d.color}; margin-top:4px;">${d.tag}</span>
-        </div>
-      </div>`;
+
+/* =========================================================
+   🚀 3. KONEKSI FIREBASE REAL-TIME
+   ========================================================= */
+// Mendengarkan perubahan data secara langsung dari Database "laporan"
+db.collection("laporan").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+  dbData = [];
+  snapshot.forEach((doc) => {
+    let data = doc.data();
+    data.id = doc.id; // Menyimpan ID unik dokumen Firebase
+    dbData.push(data);
+  });
+  
+  // Update Tampilan Otomatis
+  document.getElementById('db-status').textContent = "🟢 Terhubung Live";
+  document.getElementById('ui-total-anabul').textContent = dbData.length;
+  terapkanFilter(currentFilter);
+  
+  // Jika sedang buka detail, update juga timeline-nya
+  if(currentId) renderTimelineOnly(currentId);
+});
+
+/* --- SIMPAN LAPORAN BARU KE FIREBASE --- */
+function simpanLaporanBaru() {
+  const nama = document.getElementById('inp-nama').value.trim();
+  const lokasi = document.getElementById('inp-lokasi').value.trim();
+  const foto = document.getElementById('input-cam').files.length;
+  
+  if(!foto || !nama || !lokasi) { showToast("Wajib menyertakan Foto, Nama, dan Lokasi! ⚠️"); return; }
+  
+  showToast("Mengirim ke satelit Firebase... ⏳");
+  
+  // Data laporan baru
+  const newReport = {
+    nama: nama,
+    lokasi: lokasi,
+    status: "darurat",
+    emoji: "🚨",
+    lat: -6.3813 + (Math.random() - 0.5) * 0.01, // Koordinat acak di sekitar Depok
+    lng: 106.8340 + (Math.random() - 0.5) * 0.01,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    updates: [{
+      waktu: new Date().toLocaleString('id-ID'),
+      user: "Zachs (Ranger)", // Disinkronkan dengan identitas Founder / Ketua RT 01
+      teks: "Laporan darurat dibuat via Kamera SaPA.",
+      tipe: "terlihat"
+    }]
+  };
+
+  db.collection("laporan").add(newReport).then(() => {
+    document.getElementById('inp-nama').value = ""; document.getElementById('inp-lokasi').value = "";
+    document.getElementById('img-preview').style.display = 'none'; document.getElementById('cam-hint').style.display = 'block';
+    showToast("Berhasil! Laporan Live di Peta 🐾");
+    showScreen('scr-peta');
+  }).catch((error) => {
+    showToast("Error Firebase: " + error.message);
   });
 }
 
-/* --- LOGIKA PETA --- */
-let map; let markerLayer;
-function initMap() {
-  if (map) return;
-  try {
-    map = L.map('map', { zoomControl: false, preferCanvas: true }).setView([-6.2080, 106.8150], 14);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    markerLayer = L.layerGroup().addTo(map);
-    terapkanFilter('all');
-  } catch (e) { console.error("Map Load Error:", e); }
-}
-
-function terapkanFilter(kategori, btnEl = null) {
-  if (btnEl) { document.querySelectorAll('.chip').forEach(btn => btn.classList.remove('on')); btnEl.classList.add('on'); }
-  markerLayer.clearLayers();
-  dbData.forEach(item => {
-    if (kategori === 'all' || item.status === kategori) {
-      const icon = L.divIcon({ className: `custom-marker marker-${item.status}`, iconSize: [20, 20] });
-      L.marker([item.lat, item.lng], { icon: icon }).bindPopup(`<b>${item.nama}</b>`).addTo(markerLayer);
-    }
-  });
-  renderList('anabul-list', kategori);
-}
-
-/* --- DETAIL & UPDATE TIMELINE --- */
+/* --- BUKA DETAIL & UPDATE KE FIREBASE --- */
 function bukaDetail(id) {
-  currentId = id; const item = dbData.find(a => a.id === id);
-  document.getElementById('det-img').textContent = item.emoji;
+  currentId = id; 
+  const item = dbData.find(a => a.id === id);
+  if(!item) return;
+  
+  document.getElementById('det-img').textContent = item.emoji || '🐾';
   document.getElementById('det-nama').textContent = item.nama;
   document.getElementById('det-lokasi').textContent = `📍 ${item.lokasi}`;
-  document.getElementById('det-wa').onclick = () => window.open(`https://wa.me/${item.wa.replace(/[^0-9]/g,"")}?text=Halo info SaPA`, '_blank');
-
-  const tl = document.getElementById('timeline-container'); tl.innerHTML = "";
-  [...item.updates].reverse().forEach(upd => {
-    let dotClass = "timeline-dot" + (upd.tipe === "hilang" ? " dot-gone" : (upd.tipe === "aman" ? " dot-safe" : ""));
-    tl.innerHTML += `
-      <div class="timeline-item"><div class="${dotClass}"></div>
-        <div class="timeline-time">${upd.waktu}</div><div class="timeline-text">${upd.teks}</div>
-        <div style="font-size: 11px; color: var(--orange); font-weight: 700; margin-top: 4px;">👤 ${upd.user}</div>
-      </div>`;
-  });
+  
+  renderTimelineOnly(id);
   showScreen('scr-detail');
+}
+
+function renderTimelineOnly(id) {
+  const item = dbData.find(a => a.id === id);
+  const tl = document.getElementById('timeline-container'); tl.innerHTML = "";
+  if(item && item.updates) {
+    [...item.updates].reverse().forEach(upd => {
+      let dotClass = "timeline-dot" + (upd.tipe === "hilang" ? " dot-gone" : (upd.tipe === "aman" || upd.tipe === "ditemukan" ? " dot-safe" : ""));
+      tl.innerHTML += `
+        <div class="timeline-item"><div class="${dotClass}"></div>
+          <div class="timeline-time">${upd.waktu}</div><div class="timeline-text">${upd.teks}</div>
+          <div style="font-size: 11px; color: var(--orange); font-weight: 700; margin-top: 4px;">👤 ${upd.user}</div>
+        </div>`;
+    });
+  }
 }
 
 function simpanUpdate() {
   const cat = document.getElementById('upd-catatan').value.trim();
+  const newStatus = document.getElementById('upd-status').value;
   if (!cat) { showToast("Mohon isi catatan kondisi! ⚠️"); return; }
   
-  const item = dbData.find(a => a.id === currentId);
-  item.updates.push({ waktu: "Baru saja", user: "Zachs (Ranger)", teks: cat, tipe: document.getElementById('upd-status').value });
-  document.getElementById('upd-catatan').value = "";
+  showToast("Mengirim update ke satelit... ⏳");
   
-  addPoin(10, "Update Pantauan");
-  bukaDetail(currentId); terapkanFilter('all');
+  const newUpdate = {
+    waktu: new Date().toLocaleString('id-ID'),
+    user: "Zachs (Ranger)",
+    teks: cat,
+    tipe: newStatus
+  };
+
+  // Update Array "updates" di Firebase
+  db.collection("laporan").doc(currentId).update({
+    status: newStatus,
+    updates: firebase.firestore.FieldValue.arrayUnion(newUpdate)
+  }).then(() => {
+    document.getElementById('upd-catatan').value = "";
+    showToast("Update Real-time Berhasil! 🐾");
+    showScreen('scr-detail');
+  });
 }
 
-/* --- KAMERA NATIVE & LAPORAN --- */
+/* --- KAMERA --- */
 function handleNativePhoto(input) {
   if (input.files && input.files[0]) {
     const reader = new FileReader();
@@ -474,19 +425,6 @@ function handleNativePhoto(input) {
     }
     reader.readAsDataURL(input.files[0]);
   }
-}
-
-function simpanLaporanBaru() {
-  const nama = document.getElementById('inp-nama').value.trim();
-  const foto = document.getElementById('input-cam').files.length;
-  if(!foto || !nama) { showToast("Wajib menyertakan Foto dan Nama! ⚠️"); return; }
-  
-  // Reset Form
-  document.getElementById('inp-nama').value = ""; document.getElementById('inp-lokasi').value = "";
-  document.getElementById('img-preview').style.display = 'none'; document.getElementById('cam-hint').style.display = 'block';
-  
-  addPoin(20, "Lapor Anabul Baru");
-  setTimeout(() => showScreen('scr-peta'), 1500);
 }
 
 window.onload = () => { initMap(); };
