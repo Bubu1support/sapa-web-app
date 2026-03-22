@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>SaPA • Satu Peta Anabul | NgePaw Ranger</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<style>
+:root {
+  --orange: #F26522; --blue: #42C0FB; --green: #25D366; 
+  --navy: #1a2340; --dark: #1A1A1A; --gold: #FFD700; --mint: #3EB489;
+  --muted: #888; --border: #EEEEEE; --white: #FFFFFF; --radius: 18px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Nunito', sans-serif; }
+body { background: #F5F5F5; color: var(--dark); overflow-x: hidden; padding-bottom: env(safe-area-inset-bottom); }
+
+/* --- Layout & Utilities --- */
+.screen { display: none; min-height: 100vh; background: #F5F5F5; }
+.active { display: block; }
+.container { max-width: 500px; margin: 0 auto; background: var(--white); min-height: 100vh; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.05); }
+
+.top-bar { padding: 20px; display: flex; align-items: center; gap: 15px; background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
+.top-bar h2 { font-size: 18px; font-weight: 900; color: var(--navy); flex: 1; }
+.btn-back { width: 40px; height: 40px; border-radius: 12px; border: none; background: #FFF8F6; color: var(--orange); font-size: 20px; font-weight: 900; cursor: pointer; }
+
+/* --- Map --- */
+#map { height: 350px; width: 100%; border-bottom: 1px solid var(--border); z-index: 1; }
+.custom-marker { border-radius: 50%; border: 2px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.3); }
+.marker-darurat { background: #f44336; }
+.marker-hilang { background: var(--orange); }
+.marker-ditemukan { background: var(--blue); }
+
+/* --- Cards --- */
+.card-list { padding: 15px; }
+.card-item { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; }
+.card-item:active { transform: scale(0.98); }
+.card-img { width: 60px; height: 60px; border-radius: 12px; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.card-info { flex: 1; }
+.card-title { font-weight: 800; font-size: 15px; color: var(--navy); margin-bottom: 4px; }
+.card-subtitle { font-size: 12px; color: var(--muted); }
+.tag { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; margin-top: 5px; }
+
+/* --- Buttons --- */
+.btn-wa { background: var(--green); color: white; border: none; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer; text-decoration: none; text-align: center; }
+.btn-primary { background: var(--orange); color: white; border: none; padding: 16px; border-radius: var(--radius); width: 100%; font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 15px; }
+.btn-outline { background: white; color: var(--orange); border: 2px solid var(--orange); padding: 12px; border-radius: 12px; width: 100%; font-size: 14px; font-weight: 800; cursor: pointer; }
+
+/* --- Timeline (Updates) --- */
+.timeline { border-left: 2px solid var(--border); margin: 20px 0 0 10px; padding-left: 20px; }
+.timeline-item { position: relative; margin-bottom: 20px; }
+.timeline-dot { position: absolute; left: -27px; top: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--orange); border: 2px solid white; }
+.timeline-dot.dot-gone { background: #f44336; }
+.timeline-dot.dot-safe { background: var(--mint); }
+.timeline-time { font-size: 11px; color: var(--muted); font-weight: 800; margin-bottom: 2px; }
+.timeline-text { font-size: 13px; color: var(--navy); line-height: 1.4; }
+.timeline-user { font-size: 11px; color: var(--orange); font-weight: 700; margin-top: 4px; }
+
+/* --- Forms --- */
+.form-group { padding: 0 20px; margin-bottom: 20px; }
+.form-group label { display: block; font-weight: 800; font-size: 14px; margin-bottom: 8px; color: var(--navy); }
+.form-group select, .form-group input, .form-group textarea { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; background: #f9f9f9; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  
+  <div id="scr-home" class="screen active">
+    <div class="top-bar">
+      <h2>Satu Peta Anabul 📍</h2>
+      <button class="btn-wa" style="background:var(--navy); padding:8px 15px;">👤 Profil</button>
+    </div>
+    
+    <div id="map"></div>
+
+    <div style="padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="font-weight: 800; font-size: 16px;">Pantauan Terkini</h3>
+    </div>
+
+    <div class="card-list" id="anabul-list">
+      </div>
+  </div>
+
+  <div id="scr-detail" class="screen">
+    <div class="top-bar">
+      <button class="btn-back" onclick="showScreen('scr-home')">←</button>
+      <h2>Detail Pantauan</h2>
+    </div>
+    <div style="padding: 20px;">
+      
+      <div id="detail-header" style="text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 60px; margin-bottom: 10px;" id="det-img">😿</div>
+        <h3 style="font-weight: 900; color: var(--navy); font-size: 20px;" id="det-nama">Nama Anabul</h3>
+        <p style="font-size: 13px; color: var(--muted);" id="det-lokasi">📍 Lokasi</p>
+        <div style="margin-top: 10px;">
+          <button class="btn-wa" id="det-wa" style="padding: 10px 20px;">💬 Hubungi Pelapor Awal</button>
+        </div>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid var(--border); margin: 20px 0;">
+
+      <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <button class="btn-primary" style="margin-top:0;" onclick="showScreen('scr-update')">+ Update Kondisi</button>
+      </div>
+
+      <h4 style="font-weight: 800; color: var(--navy); font-size: 15px;">Riwayat Pantauan Ranger</h4>
+      <div class="timeline" id="timeline-container">
+        </div>
+
+    </div>
+  </div>
+
+  <div id="scr-update" class="screen">
+    <div class="top-bar">
+      <button class="btn-back" onclick="showScreen('scr-detail')">←</button>
+      <h2>Update Anabul</h2>
+    </div>
+    <div style="padding-top:20px;">
+      <div class="form-group">
+        <label>Kondisi Saat Ini di Lokasi</label>
+        <select id="upd-status">
+          <option value="terlihat">👀 Masih terlihat / Ada di lokasi</option>
+          <option value="hilang">❌ Tidak ditemukan / Sudah pergi</option>
+          <option value="aman">✅ Sudah aman / Diselamatkan</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Catatan Tambahan</label>
+        <textarea id="upd-catatan" rows="3" placeholder="Contoh: Saya cek ke gang sebelah tidak ada, sepertinya pindah."></textarea>
+      </div>
+      <div class="form-group">
+        <button class="btn-primary" onclick="simpanUpdate()">Kirim Update 🐾</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* --- DATABASE DUMMY (Dengan Array Updates) --- */
+let dbData = [
+  { 
+    id: 1, nama: "Mimi (Kucing Calico)", status: "hilang", emoji: "😿", 
+    lat: -6.2050, lng: 106.8120, lokasi: "Cilodong, Depok", wa: "628123456789",
+    updates: [
+      { waktu: "Hari ini, 10:00 WIB", user: "Pelapor Awal", teks: "Mimi lepas dari rumah, pakai kalung merah.", tipe: "terlihat" }
+    ]
+  },
+  { 
+    id: 2, nama: "Anjing Domestik Luka", status: "darurat", emoji: "🐕", 
+    lat: -6.2150, lng: 106.8100, lokasi: "Margonda, Depok", wa: "6289988776655",
+    updates: [
+      { waktu: "Kemarin, 15:30 WIB", user: "Budi (Ranger)", teks: "Terlihat pincang di depan minimarket.", tipe: "terlihat" },
+      { waktu: "Kemarin, 18:00 WIB", user: "Andi (Ranger)", teks: "Saya cek ke minimarket, anjingnya sudah tidak ada di sana.", tipe: "hilang" }
+    ]
+  }
+];
+
+let currentAnabulId = null;
+
+/* --- FUNGSI RENDER BERANDA --- */
+function renderBeranda() {
+  const list = document.getElementById('anabul-list');
+  list.innerHTML = "";
+  dbData.forEach(item => {
+    // Ambil update terakhir untuk ditampilkan sebagai status singkat
+    const lastUpdate = item.updates[item.updates.length - 1];
+    
+    let tagColor = item.status === 'darurat' ? '#f44336' : 'var(--orange)';
+    let tagBg = item.status === 'darurat' ? '#ffebee' : '#fff8f6';
+
+    list.innerHTML += `
+      <div class="card-item" onclick="bukaDetail(${item.id})">
+        <div class="card-img" style="background:${tagBg};">${item.emoji}</div>
+        <div class="card-info">
+          <div class="card-title">${item.nama}</div>
+          <div class="card-subtitle">📍 ${item.lokasi}</div>
+          <div style="font-size:11px; color:var(--muted); margin-top:4px;">
+            🕒 Update: ${lastUpdate.teks.substring(0,30)}...
+          </div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+/* --- FUNGSI BUKA DETAIL & TIMELINE --- */
+function bukaDetail(id) {
+  currentAnabulId = id;
+  const anabul = dbData.find(a => a.id === id);
+  
+  // Set Header Info
+  document.getElementById('det-img').textContent = anabul.emoji;
+  document.getElementById('det-nama').textContent = anabul.nama;
+  document.getElementById('det-lokasi').textContent = `📍 ${anabul.lokasi}`;
+  document.getElementById('det-wa').onclick = () => hubungiPelapor(anabul.nama, anabul.wa);
+
+  // Render Timeline
+  const timeline = document.getElementById('timeline-container');
+  timeline.innerHTML = "";
+  
+  // Balik array agar update terbaru ada di paling atas
+  const reversedUpdates = [...anabul.updates].reverse();
+
+  reversedUpdates.forEach(upd => {
+    let dotClass = "timeline-dot";
+    if (upd.tipe === "hilang") dotClass += " dot-gone";
+    if (upd.tipe === "aman") dotClass += " dot-safe";
+
+    timeline.innerHTML += `
+      <div class="timeline-item">
+        <div class="${dotClass}"></div>
+        <div class="timeline-time">${upd.waktu}</div>
+        <div class="timeline-text">${upd.teks}</div>
+        <div class="timeline-user">👤 ${upd.user}</div>
+      </div>
+    `;
+  });
+
+  showScreen('scr-detail');
+}
+
+/* --- FUNGSI SIMPAN UPDATE --- */
+function simpanUpdate() {
+  const status = document.getElementById('upd-status').value;
+  const catatan = document.getElementById('upd-catatan').value;
+  
+  if (!catatan) { alert("Mohon isi catatan kondisi terkini!"); return; }
+
+  // Cari anabul yang sedang diedit
+  const anabul = dbData.find(a => a.id === currentAnabulId);
+  
+  // Tambahkan update baru ke array
+  anabul.updates.push({
+    waktu: "Baru saja", // Simulasi waktu
+    user: "Zachs (Anda)",
+    teks: catatan,
+    tipe: status
+  });
+
+  alert("Update berhasil ditambahkan! Ranger lain sekarang bisa melihat status terbaru.");
+  
+  // Bersihkan form
+  document.getElementById('upd-catatan').value = "";
+  
+  // Refresh tampilan detail
+  bukaDetail(currentAnabulId);
+  renderBeranda(); // Refresh juga di depan agar ringkasan terupdate
+}
+
+/* --- MAP & NAVIGASI SPA --- */
+let map;
+function initMap() {
+  if (map) return;
+  map = L.map('map', { zoomControl: false, preferCanvas: true }).setView([-6.2080, 106.8150], 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  
+  dbData.forEach(item => {
+    const icon = L.divIcon({ className: `custom-marker marker-${item.status}`, iconSize: [20, 20] });
+    L.marker([item.lat, item.lng], { icon: icon }).bindPopup(`<b>${item.nama}</b>`).addTo(map);
+  });
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id === 'scr-home' && map) { setTimeout(() => map.invalidateSize(), 200); }
+}
+
+function hubungiPelapor(nama, wa) {
+  const cleanWA = wa.replace(/[^0-9]/g, "");
+  window.open(`https://wa.me/${cleanWA}?text=${encodeURIComponent(`Halo, saya melihat info tentang ${nama} di aplikasi SaPA.`)}`, '_blank');
+}
+
+window.onload = () => {
+  initMap();
+  renderBeranda();
+};
+</script>
+
+</body>
+</html>
