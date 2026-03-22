@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>SaPA • Satu Peta Anabul</title>
+<title>SaPA • Satu Peta Anabul | NgePaw Ranger</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
@@ -14,420 +14,38 @@
 
 <style>
 /* ── VARIABEL & RESET ── */
-:root { --orange: #F26522; --blue: #42C0FB; --green: #25D366; --navy: #1a2340; --dark: #1A1A1A; --gold: #FFD700; --mint: #3EB489; --muted: #888; --border: #EEEEEE; --white: #FFFFFF; --radius: 18px; }
+:root {
+  --orange: #F26522; --orange-l: #F5874F; --orange-bg: #FFF8F6;
+  --blue: #42C0FB; --green: #25D366; --navy: #1a2340; --dark: #1A1A1A;
+  --gold: #FFD700; --mint: #3EB489;
+  --muted: #888; --border: #EEEEEE; --white: #FFFFFF; --radius: 18px;
+}
 * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; font-family:'Nunito',sans-serif; }
 body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
 
-/* ── LAYOUT & ANIMASI ── */
+/* ── ANIMASI & LAYOUT ── */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-.screen { display:none; min-height:100vh; background:#F5F5F5; padding-bottom:80px; }
+.screen { display:none; min-height:100vh; background:#F5F5F5; padding-bottom:100px; }
 .screen.active { display:block; animation: fadeIn 0.3s ease-out; }
 .container { max-width:500px; margin:0 auto; background:var(--white); min-height:100vh; position:relative; box-shadow:0 0 30px rgba(0,0,0,0.06); }
 
-/* ── HEADER & TOP BAR ── */
+/* ── HEADER ── */
 .app-header { background:linear-gradient(135deg, var(--navy), #0f1a2e); color:var(--white); text-align:center; padding:28px 20px 24px; border-bottom-left-radius:24px; border-bottom-right-radius:24px; }
 .header-logo-ring { width:80px; height:80px; margin:0 auto 12px; background:var(--white); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.25); font-size:40px; }
 .header-title { font-size:20px; font-weight:900; }
 .header-title span { color:var(--orange); }
-.lebaran-pill { display:inline-block; background:rgba(255,215,0,0.15); border:1px solid rgba(255,215,0,0.3); padding:4px 12px; border-radius:20px; font-size:11px; font-weight:800; color:var(--gold); margin-top:8px; }
 
-.top-bar { padding:16px 18px; display:flex; align-items:center; gap:14px; background:var(--white); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:1000; }
-.top-bar h2 { font-size:18px; font-weight:900; color:var(--navy); flex:1; }
-.btn-back { width:40px; height:40px; border-radius:12px; border:none; background:#FFF8F6; color:var(--orange); font-size:22px; font-weight:900; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-
-/* ── UI COMPONENTS ── */
+/* ── STATS & MENU ── */
 .stats-strip { display:grid; grid-template-columns:repeat(4,1fr); background:white; border-bottom:1px solid var(--border); }
 .stat-item { text-align:center; padding:12px 4px; border-right:1px solid var(--border); cursor:pointer; }
 .stat-val { font-size:20px; font-weight:900; }
 .stat-lbl { font-size:9px; font-weight:700; color:var(--muted); margin-top:2px; }
 
 .menu-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:15px; }
-.menu-card { background:var(--white); border:1px solid var(--border); border-radius:18px; padding:16px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.02); cursor:pointer; transition:0.2s; }
-.menu-card:active { transform:scale(0.96); }
+.menu-card { background:var(--white); border:1px solid var(--border); border-radius:18px; padding:16px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.02); cursor:pointer; }
 .menu-card.primary { grid-column:span 2; background:var(--orange); border-color:var(--orange); color:white; }
 .card-icon { font-size:32px; margin-bottom:8px; }
-.card-title { font-size:14px; font-weight:800; margin-bottom:4px; color:var(--navy); }
-.primary .card-title { color:white; }
-.card-btn { background:#f5f5f5; color:var(--navy); border:none; padding:8px; border-radius:10px; font-size:11px; font-weight:800; width:100%; pointer-events:none; }
-.primary .card-btn { background:rgba(255,255,255,0.2); color:white; }
 
-/* Map, List & Timeline */
+/* ── PETA & LIST ── */
 #map { height:360px; width:100%; border-bottom:1px solid var(--border); z-index:1; }
-.chip-row { display:flex; gap:8px; padding:12px 15px; overflow-x:auto; background:var(--white); border-bottom:1px solid var(--border); scrollbar-width:none; }
-.chip-row::-webkit-scrollbar { display:none; }
-.chip { padding:6px 14px; border-radius:20px; border:1px solid var(--border); font-size:12px; font-weight:800; color:var(--muted); cursor:pointer; white-space:nowrap; transition:0.2s; background:white; }
-.chip.on { background:var(--navy); color:white; border-color:var(--navy); }
-.custom-marker { border-radius: 50%; border: 2px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.3); }
-.marker-darurat { background: #f44336; }
-.marker-hilang { background: var(--orange); }
-.marker-ditemukan { background: var(--blue); }
-
-.list-item { background:white; border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; display:flex; gap:12px; align-items:center; cursor:pointer; transition:0.2s; }
-.list-emoji { font-size:30px; background:#f9f9f9; width:50px; height:50px; display:flex; align-items:center; justify-content:center; border-radius:12px; }
-
-.timeline { border-left: 2px solid var(--border); margin: 20px 0 0 10px; padding-left: 20px; }
-.timeline-item { position: relative; margin-bottom: 20px; }
-.timeline-dot { position: absolute; left: -27px; top: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--orange); border: 2px solid white; }
-.timeline-dot.dot-gone { background: #f44336; }
-.timeline-dot.dot-safe { background: var(--mint); }
-.timeline-time { font-size: 11px; color: var(--muted); font-weight: 800; margin-bottom: 2px; }
-.timeline-text { font-size: 13px; color: var(--navy); line-height: 1.4; }
-
-/* Forms */
-.form-group { margin-bottom:16px; padding:0 18px;}
-.form-group label { display:block; font-weight:800; font-size:13px; margin-bottom:7px; color:var(--navy); }
-.f-input { width:100%; padding:14px; border:1.5px solid var(--border); border-radius:12px; font-size:14px; background:#f9f9f9; outline:none; }
-.f-input:focus { border-color:var(--orange); background:white; }
-.btn-primary { background:var(--orange); color:white; border:none; padding:16px; border-radius:var(--radius); width:100%; font-size:15px; font-weight:800; cursor:pointer; margin-top:10px; transition:0.2s; }
-.btn-primary:active { transform:scale(0.97); }
-
-#toast { position:fixed; bottom:-60px; left:50%; transform:translateX(-50%); background:#222; color:white; padding:12px 20px; border-radius:30px; font-size:13px; font-weight:800; opacity:0; transition:0.4s; z-index:2000; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
-#toast.show { bottom:90px; opacity:1; }
-
-#bottom-nav { position:fixed; bottom:0; width:100%; max-width:500px; background:white; display:flex; border-top:1px solid var(--border); z-index:1000; box-shadow:0 -4px 16px rgba(0,0,0,.07); left:50%; transform:translateX(-50%); padding-bottom:env(safe-area-inset-bottom); }
-.nav-item { flex:1; text-align:center; padding:10px 2px 8px; font-size:8.5px; font-weight:700; color:var(--muted); cursor:pointer; transition:0.2s;}
-.nav-item .ni { font-size:22px; display:block; margin-bottom:2px; transition:0.2s;}
-.nav-item.active { color:var(--orange); }
-.nav-item.active .ni { transform:translateY(-2px); }
-</style>
-</head>
-<body>
-
-<div class="container">
-
-  <div id="scr-home" class="screen active">
-    <div class="app-header">
-      <div class="header-logo-ring">🐾</div>
-      <div class="header-title">Satu Peta <span>Anabul</span></div>
-      <div class="lebaran-pill">✨ NgePaw Ranger</div>
-      <div style="font-size:12px; color:rgba(255,255,255,0.7); margin-top:10px; font-weight:700;">Database: <span id="db-status" style="color:#25D366">Menghubungkan...</span></div>
-    </div>
-
-    <div class="stats-strip">
-      <div class="stat-item"><div class="stat-val" id="ui-total-anabul" style="color:var(--orange)">0</div><div class="stat-lbl">Anabul</div></div>
-      <div class="stat-item"><div class="stat-val" style="color:var(--blue)">5</div><div class="stat-lbl">Klinik</div></div>
-      <div class="stat-item"><div class="stat-val" style="color:var(--mint)">8</div><div class="stat-lbl">Komunitas</div></div>
-      <div class="stat-item"><div class="stat-val" style="color:var(--gold)">1.240</div><div class="stat-lbl">Poinku 🏆</div></div>
-    </div>
-
-    <div class="menu-grid">
-      <div class="menu-card primary" onclick="showScreen('scr-peta')">
-        <div class="card-icon">🗺️</div><div class="card-title">Peta Anabul</div><button class="card-btn">Buka Peta Live</button>
-      </div>
-      <div class="menu-card" onclick="showScreen('scr-lapor')">
-        <div class="card-icon">🚨</div><div class="card-title">Lapor Cepat</div><button class="card-btn">Kamera Ranger</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="scr-peta" class="screen">
-    <div class="top-bar">
-      <button class="btn-back" onclick="showScreen('scr-home')">←</button>
-      <h2>Peta Ranger Live</h2>
-    </div>
-    <div class="chip-row">
-      <div class="chip on" onclick="terapkanFilter('all', this)">📍 Semua</div>
-      <div class="chip" onclick="terapkanFilter('darurat', this)">🚨 Darurat</div>
-      <div class="chip" onclick="terapkanFilter('hilang', this)">😿 Hilang</div>
-      <div class="chip" onclick="terapkanFilter('ditemukan', this)">💙 Ditemukan</div>
-    </div>
-    <div id="map"></div>
-    <div style="padding: 15px;">
-      <h3 style="font-weight: 800; font-size: 15px; margin-bottom:10px; color:var(--navy);">Daftar Pantauan Firebase</h3>
-      <div id="anabul-list"><i>Memuat data dari satelit...</i></div>
-    </div>
-  </div>
-
-  <div id="scr-lapor" class="screen">
-    <div class="top-bar">
-      <button class="btn-back" onclick="showScreen('scr-home')">←</button>
-      <h2>Lapor Anabul Baru</h2>
-    </div>
-    <div style="padding-top:20px;">
-      <div class="form-group">
-        <label>Ambil Foto (Wajib Kamera)</label>
-        <div style="border:2px dashed #DDD; border-radius:14px; padding:40px 10px; text-align:center; cursor:pointer; background:white;" onclick="document.getElementById('input-cam').click()">
-          <span id="cam-hint" style="font-weight:800; color:var(--muted);">📷 Ketuk untuk memotret</span>
-          <img id="img-preview" style="display:none; width:100%; border-radius:12px; object-fit:cover; max-height:250px;">
-        </div>
-        <input type="file" id="input-cam" accept="image/*" capture="environment" style="display:none;" onchange="handleNativePhoto(this)">
-      </div>
-      <div class="form-group">
-        <label>Nama / Kondisi Singkat</label>
-        <input type="text" id="inp-nama" class="f-input" placeholder="Contoh: Kucing Luka di Margonda">
-      </div>
-      <div class="form-group">
-        <label>Lokasi / Patokan</label>
-        <input type="text" id="inp-lokasi" class="f-input" placeholder="Contoh: Depan Indomaret">
-      </div>
-      <div class="form-group">
-        <button class="btn-primary" onclick="simpanLaporanBaru()">Kirim Laporan ke Database 🐾</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="scr-detail" class="screen">
-    <div class="top-bar">
-      <button class="btn-back" onclick="showScreen('scr-peta')">←</button>
-      <h2>Detail Pantauan</h2>
-    </div>
-    <div style="padding: 20px;">
-      <div style="text-align: center; margin-bottom: 20px; background:white; padding:20px; border-radius:16px; border:1px solid var(--border);">
-        <div style="font-size: 60px; margin-bottom: 10px;" id="det-img">🚨</div>
-        <h3 style="font-weight: 900; color: var(--navy); font-size: 20px;" id="det-nama">Nama</h3>
-        <p style="font-size: 13px; color: var(--muted); margin-top:5px;" id="det-lokasi">📍 Lokasi</p>
-      </div>
-      <button class="btn-primary" style="margin-top:0; background:white; color:var(--orange); border:2px solid var(--orange);" onclick="showScreen('scr-update')">📝 + Update Kondisi Real-time</button>
-      <h4 style="font-weight: 800; color: var(--navy); font-size: 15px; margin-top:25px;">Riwayat Pantauan Database</h4>
-      <div class="timeline" id="timeline-container"></div>
-    </div>
-  </div>
-
-  <div id="scr-update" class="screen">
-    <div class="top-bar">
-      <button class="btn-back" onclick="showScreen('scr-detail')">←</button>
-      <h2>Update Anabul</h2>
-    </div>
-    <div style="padding-top:20px;">
-      <div class="form-group">
-        <label>Kondisi Saat Ini di Lokasi</label>
-        <select id="upd-status" class="f-input">
-          <option value="terlihat">👀 Masih terlihat / Ada di lokasi</option>
-          <option value="hilang">❌ Tidak ditemukan / Pindah tempat</option>
-          <option value="ditemukan">✅ Sudah aman / Diselamatkan</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Catatan Tambahan (Wajib)</label>
-        <textarea id="upd-catatan" class="f-input" rows="3" placeholder="Contoh: Saya sudah ke lokasi, anabul aman..."></textarea>
-      </div>
-      <div class="form-group">
-        <button class="btn-primary" onclick="simpanUpdate()">Kirim Update (+10 Poin)</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="toast">Notifikasi</div>
-  <div id="bottom-nav">
-    <div class="nav-item active" onclick="showScreen('scr-home')"><span class="ni">🏠</span>Beranda</div>
-    <div class="nav-item" onclick="showScreen('scr-peta')"><span class="ni">🗺️</span>Peta</div>
-    <div class="nav-item" onclick="showScreen('scr-lapor')"><span class="ni">📸</span>Lapor</div>
-  </div>
-</div>
-
-<script>
-/* =========================================================
-   🔥 1. KONFIGURASI FIREBASE ANDA (PASTE DI SINI!) 🔥
-   ========================================================= */
-const firebaseConfig = {
-  // 👇 PASTE KODE DARI GAMBAR ANDA DI BAWAH INI 👇
-  const firebaseConfig = {
-  apiKey: "AIzaSyCj_aZOIOuiZEM7LsDTEtU3Ri_kqcQ-Mtk",
-  authDomain: "sapa-database-96958.firebaseapp.com",
-  projectId: "sapa-database-96958",
-  storageBucket: "sapa-database-96958.firebasestorage.app",
-  messagingSenderId: "613533167320",
-  appId: "1:613533167320:web:c6730a0cb1dd63e35631ad",
-};
-
-  // 👆 PASTE KODE DARI GAMBAR ANDA DI ATAS INI 👆
-};
-
-// Inisialisasi Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-/* =========================================================
-   🛠️ 2. VARIABEL & LOGIKA APLIKASI
-   ========================================================= */
-let dbData = []; // Data sekarang kosong, akan diisi otomatis oleh Firebase!
-let currentId = null;
-let currentFilter = 'all';
-
-function showToast(msg) {
-  const toast = document.getElementById('toast'); toast.textContent = msg;
-  toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if(id === 'scr-home') document.querySelectorAll('.nav-item')[0].classList.add('active');
-  if(id === 'scr-peta' || id === 'scr-detail') { document.querySelectorAll('.nav-item')[1].classList.add('active'); if(map && id === 'scr-peta') setTimeout(()=>map.invalidateSize(),200); }
-  if(id === 'scr-lapor') document.querySelectorAll('.nav-item')[2].classList.add('active');
-}
-
-/* --- LOGIKA PETA & RENDER --- */
-let map; let markerLayer;
-function initMap() {
-  if (map) return;
-  map = L.map('map', { zoomControl: false, preferCanvas: true }).setView([-6.3813, 106.8340], 14); // Kordinat Margonda/Depok
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-  markerLayer = L.layerGroup().addTo(map);
-}
-
-function terapkanFilter(kategori, btnEl = null) {
-  if (btnEl) { document.querySelectorAll('.chip').forEach(btn => btn.classList.remove('on')); btnEl.classList.add('on'); }
-  currentFilter = kategori;
-  
-  if(!markerLayer) return;
-  markerLayer.clearLayers();
-  
-  const list = document.getElementById('anabul-list'); list.innerHTML = "";
-  
-  if(dbData.length === 0) { list.innerHTML = "<p style='color:#888; font-size:12px;'>Belum ada laporan di Firebase.</p>"; return; }
-
-  dbData.forEach(item => {
-    if (kategori === 'all' || item.status === kategori) {
-      // 1. Gambar Marker di Peta
-      const icon = L.divIcon({ className: `custom-marker marker-${item.status}`, iconSize: [20, 20] });
-      L.marker([item.lat, item.lng], { icon: icon }).bindPopup(`<b>${item.nama}</b>`).addTo(markerLayer);
-      
-      // 2. Buat Daftar List
-      const lastUpd = item.updates && item.updates.length > 0 ? item.updates[item.updates.length - 1] : {teks: "Belum ada update"};
-      let tagBg = item.status === 'darurat' ? '#ffebee' : (item.status === 'hilang' ? '#fff8f6' : '#e3f2fd');
-      let tagColor = item.status === 'darurat' ? '#f44336' : (item.status === 'hilang' ? 'var(--orange)' : 'var(--blue)');
-      
-      list.innerHTML += `
-        <div class="list-item" onclick="bukaDetail('${item.id}')">
-          <div class="list-emoji">${item.emoji || '🐾'}</div>
-          <div style="flex:1;">
-            <div style="font-weight:800; font-size:14px; color:var(--navy);">${item.nama}</div>
-            <div style="font-size:11px; color:var(--muted); margin-top:2px;">📍 ${item.lokasi}</div>
-            <span class="tag" style="background:${tagBg}; color:${tagColor}; margin-top:4px;">${item.status.toUpperCase()}</span>
-          </div>
-        </div>`;
-    }
-  });
-}
-
-/* =========================================================
-   🚀 3. KONEKSI FIREBASE REAL-TIME
-   ========================================================= */
-// Mendengarkan perubahan data secara langsung dari Database "laporan"
-db.collection("laporan").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-  dbData = [];
-  snapshot.forEach((doc) => {
-    let data = doc.data();
-    data.id = doc.id; // Menyimpan ID unik dokumen Firebase
-    dbData.push(data);
-  });
-  
-  // Update Tampilan Otomatis
-  document.getElementById('db-status').textContent = "🟢 Terhubung Live";
-  document.getElementById('ui-total-anabul').textContent = dbData.length;
-  terapkanFilter(currentFilter);
-  
-  // Jika sedang buka detail, update juga timeline-nya
-  if(currentId) renderTimelineOnly(currentId);
-});
-
-/* --- SIMPAN LAPORAN BARU KE FIREBASE --- */
-function simpanLaporanBaru() {
-  const nama = document.getElementById('inp-nama').value.trim();
-  const lokasi = document.getElementById('inp-lokasi').value.trim();
-  const foto = document.getElementById('input-cam').files.length;
-  
-  if(!foto || !nama || !lokasi) { showToast("Wajib menyertakan Foto, Nama, dan Lokasi! ⚠️"); return; }
-  
-  showToast("Mengirim ke satelit Firebase... ⏳");
-  
-  // Data laporan baru
-  const newReport = {
-    nama: nama,
-    lokasi: lokasi,
-    status: "darurat",
-    emoji: "🚨",
-    lat: -6.3813 + (Math.random() - 0.5) * 0.01, // Koordinat acak di sekitar Depok
-    lng: 106.8340 + (Math.random() - 0.5) * 0.01,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    updates: [{
-      waktu: new Date().toLocaleString('id-ID'),
-      user: "Zachs (Ranger)", // Disinkronkan dengan identitas Founder / Ketua RT 01
-      teks: "Laporan darurat dibuat via Kamera SaPA.",
-      tipe: "terlihat"
-    }]
-  };
-
-  db.collection("laporan").add(newReport).then(() => {
-    document.getElementById('inp-nama').value = ""; document.getElementById('inp-lokasi').value = "";
-    document.getElementById('img-preview').style.display = 'none'; document.getElementById('cam-hint').style.display = 'block';
-    showToast("Berhasil! Laporan Live di Peta 🐾");
-    showScreen('scr-peta');
-  }).catch((error) => {
-    showToast("Error Firebase: " + error.message);
-  });
-}
-
-/* --- BUKA DETAIL & UPDATE KE FIREBASE --- */
-function bukaDetail(id) {
-  currentId = id; 
-  const item = dbData.find(a => a.id === id);
-  if(!item) return;
-  
-  document.getElementById('det-img').textContent = item.emoji || '🐾';
-  document.getElementById('det-nama').textContent = item.nama;
-  document.getElementById('det-lokasi').textContent = `📍 ${item.lokasi}`;
-  
-  renderTimelineOnly(id);
-  showScreen('scr-detail');
-}
-
-function renderTimelineOnly(id) {
-  const item = dbData.find(a => a.id === id);
-  const tl = document.getElementById('timeline-container'); tl.innerHTML = "";
-  if(item && item.updates) {
-    [...item.updates].reverse().forEach(upd => {
-      let dotClass = "timeline-dot" + (upd.tipe === "hilang" ? " dot-gone" : (upd.tipe === "aman" || upd.tipe === "ditemukan" ? " dot-safe" : ""));
-      tl.innerHTML += `
-        <div class="timeline-item"><div class="${dotClass}"></div>
-          <div class="timeline-time">${upd.waktu}</div><div class="timeline-text">${upd.teks}</div>
-          <div style="font-size: 11px; color: var(--orange); font-weight: 700; margin-top: 4px;">👤 ${upd.user}</div>
-        </div>`;
-    });
-  }
-}
-
-function simpanUpdate() {
-  const cat = document.getElementById('upd-catatan').value.trim();
-  const newStatus = document.getElementById('upd-status').value;
-  if (!cat) { showToast("Mohon isi catatan kondisi! ⚠️"); return; }
-  
-  showToast("Mengirim update ke satelit... ⏳");
-  
-  const newUpdate = {
-    waktu: new Date().toLocaleString('id-ID'),
-    user: "Zachs (Ranger)",
-    teks: cat,
-    tipe: newStatus
-  };
-
-  // Update Array "updates" di Firebase
-  db.collection("laporan").doc(currentId).update({
-    status: newStatus,
-    updates: firebase.firestore.FieldValue.arrayUnion(newUpdate)
-  }).then(() => {
-    document.getElementById('upd-catatan').value = "";
-    showToast("Update Real-time Berhasil! 🐾");
-    showScreen('scr-detail');
-  });
-}
-
-/* --- KAMERA --- */
-function handleNativePhoto(input) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = e => { 
-      document.getElementById('img-preview').src = e.target.result; 
-      document.getElementById('img-preview').style.display = 'block'; 
-      document.getElementById('cam-hint').style.display = 'none'; 
-    }
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
-window.onload = () => { initMap(); };
-</script>
-</body>
-</html>
+.list-item { background:white; border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; display:flex; gap:12px; align-items:center; cursor:pointer; }
