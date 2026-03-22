@@ -4,11 +4,13 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>SaPA • Satu Peta Anabul | NgePaw Ranger</title>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
 <style>
-/* --- SEMUA CSS V4 ANDA TETAP ADA DI SINI --- */
+/* ── VARIABEL & RESET ── */
 :root {
   --orange: #F26522; --orange-l: #F5874F; --orange-bg: #FFF8F6;
   --blue: #42C0FB; --green: #25D366; --navy: #1a2340; --dark: #1A1A1A;
@@ -18,102 +20,19 @@
 * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; font-family:'Nunito',sans-serif; }
 body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
 
+/* ── LAYOUT UTAMA ── */
 .screen { display:none; min-height:100vh; background:#F5F5F5; }
 .screen.active { display:block; }
 .container { max-width:500px; margin:0 auto; background:var(--white); min-height:100vh; position:relative; box-shadow:0 0 30px rgba(0,0,0,0.06); }
 
-/* (CSS Header, Card, Poin, Bottom Nav dari V4 tetap sama) */
+/* ── HEADER V4 & TOP BAR ── */
 .app-header { background:linear-gradient(135deg, var(--navy), #0f1a2e); color:var(--white); text-align:center; padding:28px 20px 24px; border-bottom-left-radius:24px; border-bottom-right-radius:24px; }
 .header-logo-ring { width:88px; height:88px; margin:0 auto 12px; background:var(--white); border-radius:50%; padding:7px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.25); }
 .header-logo-ring img { width:100%; height:100%; object-fit:contain; border-radius:50%; }
+.header-title { font-size:20px; font-weight:900; letter-spacing:0.5px; margin-bottom:4px; }
+.header-title span { color:var(--orange); }
+.header-sub { font-size:12px; color:rgba(255,255,255,0.7); font-weight:600; margin-top:10px; }
+.lebaran-pill { display:inline-block; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); padding:4px 12px; border-radius:20px; font-size:11px; font-weight:800; margin-top:8px; }
+
 .top-bar { padding:16px 18px; display:flex; align-items:center; gap:14px; background:var(--white); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:1000; }
-.btn-back { width:40px; height:40px; border-radius:12px; border:none; background:var(--orange-bg); color:var(--orange); font-size:22px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-.btn-admin { background:var(--green); color:white; border:none; padding:9px 14px; border-radius:12px; font-size:13px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:5px; }
-
-/* CSS BARU: TIMELINE & UPDATE DETAIL */
-.timeline { border-left: 2px solid var(--border); margin: 20px 0 0 10px; padding-left: 20px; }
-.timeline-item { position: relative; margin-bottom: 20px; }
-.timeline-dot { position: absolute; left: -27px; top: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--orange); border: 2px solid white; }
-.timeline-dot.dot-gone { background: #f44336; }
-.timeline-dot.dot-safe { background: var(--mint); }
-.timeline-time { font-size: 11px; color: var(--muted); font-weight: 800; margin-bottom: 2px; }
-.timeline-text { font-size: 13px; color: var(--navy); line-height: 1.4; }
-.timeline-user { font-size: 11px; color: var(--orange); font-weight: 700; margin-top: 4px; }
-
-/* Custom Map Markers Leaflet */
-#map { height:360px; width:100%; border-bottom:1px solid var(--border); }
-.custom-marker { border-radius: 50%; border: 2px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.3); }
-.marker-darurat { background: #f44336; }
-.marker-hilang { background: var(--orange); }
-.marker-ditemukan { background: var(--blue); }
-
-/* V4 Forms & Utils */
-.form-group { margin-bottom:16px; padding:0 18px;}
-.form-group label { display:block; font-weight:800; font-size:13px; margin-bottom:7px; color:var(--navy); }
-.f-input { width:100%; padding:13px 14px; border:1.5px solid var(--border); border-radius:12px; font-size:14px; font-family:'Nunito',sans-serif; background:#f9f9f9; }
-.btn-primary { background:var(--orange); color:white; border:none; padding:16px; border-radius:var(--radius); width:100%; font-size:16px; font-weight:800; cursor:pointer; margin-top:15px; }
-
-#bottom-nav { position:fixed; bottom:0; width:100%; max-width:500px; background:white; display:flex; border-top:1px solid var(--border); z-index:1000; box-shadow:0 -4px 16px rgba(0,0,0,.07); left:50%; transform:translateX(-50%); }
-.nav-item { flex:1; text-align:center; padding:10px 2px 8px; font-size:8.5px; font-weight:700; color:var(--muted); cursor:pointer; }
-.nav-item .ni { font-size:22px; display:block; margin-bottom:2px; }
-.nav-item.active { color:var(--orange); }
-</style>
-</head>
-<body>
-
-<div class="container">
-
-  <div id="scr-home" class="screen active" style="padding-bottom:70px">
-    <div class="app-header">
-      <div class="header-logo-ring">
-        <img src="sipa-logo-footer.png" alt="Logo"> 
-      </div>
-      <div class="header-title">Satu Peta <span>Anabul</span></div>
-      <div class="lebaran-pill">✨ NgePaw Ranger</div>
-      <div class="header-sub">Healthy Owner, Happy Anabul</div>
-    </div>
-
-    <div class="menu-grid" style="padding-top:20px;">
-      <div class="menu-card primary" onclick="showScreen('scr-peta')">
-        <div class="card-icon">🗺️</div><div class="card-title">Peta Anabul</div><button class="card-btn">Buka Peta</button>
-      </div>
-      <div class="menu-card" onclick="showScreen('scr-lapor')">
-        <div class="card-icon">🚨</div><div class="card-title">Lapor Anabul</div><button class="card-btn">Lapor Sekarang</button>
-      </div>
-      <div class="menu-card" onclick="showScreen('scr-lf')">
-        <div class="card-icon">🔍</div><div class="card-title">Hewan Hilang</div><button class="card-btn">Lost & Found</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="scr-peta" class="screen" style="padding-bottom:70px">
-    <div class="top-bar">
-      <button class="btn-back" onclick="showScreen('scr-home')">←</button>
-      <h2>Peta Ranger</h2>
-    </div>
-    
-    <div class="chip-row">
-      <div class="chip on" onclick="terapkanFilterMap('all', this)">📍 Semua</div>
-      <div class="chip" onclick="terapkanFilterMap('darurat', this)">🚨 Darurat</div>
-      <div class="chip" onclick="terapkanFilterMap('hilang', this)">😿 Hilang</div>
-      <div class="chip" onclick="terapkanFilterMap('ditemukan', this)">💙 Ditemukan</div>
-    </div>
-    <div id="map"></div>
-    
-    <div style="padding: 15px;">
-      <h3 style="font-weight: 800; font-size: 15px; margin-bottom:10px;">Pantauan Terbaru</h3>
-      <div id="anabul-list">
-        </div>
-    </div>
-  </div>
-
-  <div id="scr-lapor" class="screen" style="padding-bottom:70px">
-    <div class="top-bar">
-      <button class="btn-back" onclick="showScreen('scr-home')">←</button>
-      <h2>Lapor Darurat</h2>
-    </div>
-    <div style="padding-top:20px;">
-      
-      <div class="form-group">
-        <label>Foto Anabul (Kamera Langsung)</label>
-        <div style="border:2px dashed #DDD; border-radius:14px; padding:
+.top-bar h2 { font-size:18px; font-weight:900; color:
