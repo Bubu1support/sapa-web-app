@@ -10,6 +10,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
 <style>
+/* ── VARIABEL & RESET ── */
 :root {
   --orange: #F26522; --blue: #42C0FB; --green: #25D366; 
   --navy: #1a2340; --dark: #1A1A1A; --mint: #3EB489;
@@ -18,11 +19,13 @@
 * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; font-family:'Nunito',sans-serif; }
 body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
 
+/* ── ANIMASI & LAYOUT ── */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 .screen { display:none; min-height:100vh; background:#F5F5F5; padding-bottom:80px; }
-.screen.active { display:block; }
+.screen.active { display:block; animation: fadeIn 0.3s ease-out; }
 .container { max-width:500px; margin:0 auto; background:var(--white); min-height:100vh; position:relative; box-shadow:0 0 30px rgba(0,0,0,0.06); }
 
-/* --- HEADER --- */
+/* ── HEADER & TOP BAR ── */
 .app-header { background:linear-gradient(135deg, var(--navy), #0f1a2e); color:var(--white); text-align:center; padding:28px 20px 24px; border-bottom-left-radius:24px; border-bottom-right-radius:24px; }
 .header-logo-ring { width:80px; height:80px; margin:0 auto 12px; background:var(--white); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.25); font-size:35px; }
 .header-title { font-size:20px; font-weight:900; }
@@ -33,30 +36,28 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
 .top-bar h2 { font-size:18px; font-weight:900; color:var(--navy); flex:1; }
 .btn-back { width:40px; height:40px; border-radius:12px; border:none; background:#FFF8F6; color:var(--orange); font-size:22px; font-weight:900; display:flex; align-items:center; justify-content:center; cursor:pointer; }
 
-/* --- GRID MENU --- */
+/* ── UI COMPONENTS ── */
 .menu-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:20px 18px; }
-.menu-card { background:var(--white); border:1px solid var(--border); border-radius:20px; padding:16px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.02); cursor:pointer; }
+.menu-card { background:var(--white); border:1px solid var(--border); border-radius:20px; padding:16px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.02); cursor:pointer; transition:0.2s;}
+.menu-card:active { transform:scale(0.96); }
 .menu-card.primary { grid-column:span 2; background:#FFF8F6; border-color:rgba(242,101,34,0.2); }
 .card-icon { font-size:32px; margin-bottom:8px; }
 .card-title { font-size:14px; font-weight:800; color:var(--navy); margin-bottom:12px; }
-.card-btn { background:#f5f5f5; color:var(--navy); border:none; padding:8px 16px; border-radius:10px; font-size:11px; font-weight:800; width:100%; cursor:pointer; }
+.card-btn { background:#f5f5f5; color:var(--navy); border:none; padding:8px 16px; border-radius:10px; font-size:11px; font-weight:800; width:100%; pointer-events:none; }
 .primary .card-btn { background:var(--orange); color:var(--white); }
 
-/* --- MAP & CARDS --- */
+/* Map & List */
 #map { height:360px; width:100%; border-bottom:1px solid var(--border); z-index:1; }
 .chip-row { display:flex; gap:8px; padding:12px 18px; overflow-x:auto; background:var(--white); border-bottom:1px solid var(--border); }
 .chip-row::-webkit-scrollbar { display:none; }
-.chip { padding:6px 14px; border-radius:20px; border:1px solid var(--border); font-size:12px; font-weight:800; color:var(--muted); cursor:pointer; white-space:nowrap; }
+.chip { padding:6px 14px; border-radius:20px; border:1px solid var(--border); font-size:12px; font-weight:800; color:var(--muted); cursor:pointer; white-space:nowrap; transition:0.2s;}
 .chip.on { background:var(--navy); color:white; border-color:var(--navy); }
-.custom-marker { border-radius: 50%; border: 2px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.3); }
-.marker-darurat { background: #f44336; }
-.marker-hilang { background: var(--orange); }
-.marker-ditemukan { background: var(--blue); }
 
-.list-item { background:white; border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; display:flex; gap:12px; align-items:center; cursor:pointer; }
+.list-item { background:white; border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; display:flex; gap:12px; align-items:center; cursor:pointer; transition:0.2s; }
+.list-item:active { background:#f9f9f9; transform:scale(0.98); }
 .list-emoji { font-size:30px; background:#f9f9f9; width:50px; height:50px; display:flex; align-items:center; justify-content:center; border-radius:12px; }
 
-/* --- TIMELINE --- */
+/* Timeline */
 .timeline { border-left: 2px solid var(--border); margin: 20px 0 0 10px; padding-left: 20px; }
 .timeline-item { position: relative; margin-bottom: 20px; }
 .timeline-dot { position: absolute; left: -27px; top: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--orange); border: 2px solid white; }
@@ -65,16 +66,28 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
 .timeline-time { font-size: 11px; color: var(--muted); font-weight: 800; margin-bottom: 2px; }
 .timeline-text { font-size: 13px; color: var(--navy); line-height: 1.4; }
 
-/* --- FORMS & NAV --- */
+/* Map Markers */
+.custom-marker { border-radius: 50%; border: 2px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.3); }
+.marker-darurat { background: #f44336; }
+.marker-hilang { background: var(--orange); }
+.marker-ditemukan { background: var(--blue); }
+
+/* Forms & Utils */
 .form-group { margin-bottom:16px; padding:0 18px;}
 .form-group label { display:block; font-weight:800; font-size:13px; margin-bottom:7px; color:var(--navy); }
-.f-input { width:100%; padding:13px 14px; border:1.5px solid var(--border); border-radius:12px; font-size:14px; background:#f9f9f9; }
-.btn-primary { background:var(--orange); color:white; border:none; padding:16px; border-radius:var(--radius); width:100%; font-size:16px; font-weight:800; cursor:pointer; margin-top:15px; }
+.f-input { width:100%; padding:14px; border:1.5px solid var(--border); border-radius:12px; font-size:14px; background:#f9f9f9; outline:none; transition:0.2s;}
+.f-input:focus { border-color:var(--orange); background:white; }
+.btn-primary { background:var(--orange); color:white; border:none; padding:16px; border-radius:var(--radius); width:100%; font-size:16px; font-weight:800; cursor:pointer; margin-top:10px; transition:0.2s;}
+.btn-primary:active { transform:scale(0.97); opacity:0.9; }
 
-#bottom-nav { position:fixed; bottom:0; width:100%; max-width:500px; background:white; display:flex; border-top:1px solid var(--border); z-index:1000; box-shadow:0 -4px 16px rgba(0,0,0,.07); left:50%; transform:translateX(-50%); }
-.nav-item { flex:1; text-align:center; padding:10px 2px 8px; font-size:8.5px; font-weight:700; color:var(--muted); cursor:pointer; }
-.nav-item .ni { font-size:22px; display:block; margin-bottom:2px; }
+#toast { position:fixed; bottom:-60px; left:50%; transform:translateX(-50%); background:#333; color:white; padding:12px 20px; border-radius:30px; font-size:13px; font-weight:700; opacity:0; transition:0.4s; z-index:2000; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
+#toast.show { bottom:90px; opacity:1; }
+
+#bottom-nav { position:fixed; bottom:0; width:100%; max-width:500px; background:white; display:flex; border-top:1px solid var(--border); z-index:1000; box-shadow:0 -4px 16px rgba(0,0,0,.07); left:50%; transform:translateX(-50%); padding-bottom:env(safe-area-inset-bottom); }
+.nav-item { flex:1; text-align:center; padding:10px 2px 8px; font-size:8.5px; font-weight:700; color:var(--muted); cursor:pointer; transition:0.2s;}
+.nav-item .ni { font-size:22px; display:block; margin-bottom:2px; transition:0.2s;}
 .nav-item.active { color:var(--orange); }
+.nav-item.active .ni { transform:translateY(-2px); }
 </style>
 </head>
 <body>
@@ -86,7 +99,7 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
       <div class="header-logo-ring">🐾</div>
       <div class="header-title">Satu Peta <span>Anabul</span></div>
       <div class="lebaran-pill">✨ NgePaw Ranger</div>
-      <div class="header-sub" style="font-size:12px; color:rgba(255,255,255,0.7); margin-top:10px;">Healthy Owner, Happy Anabul</div>
+      <div style="font-size:12px; color:rgba(255,255,255,0.7); margin-top:10px; font-weight:700;">Healthy Owner, Happy Anabul</div>
     </div>
 
     <div class="menu-grid">
@@ -96,8 +109,8 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
       <div class="menu-card" onclick="showScreen('scr-lapor')">
         <div class="card-icon">🚨</div><div class="card-title">Lapor Cepat</div><button class="card-btn">Kamera Ranger</button>
       </div>
-      <div class="menu-card" onclick="showScreen('scr-profil')">
-        <div class="card-icon">👤</div><div class="card-title">Profil Saya</div><button class="card-btn">Cek Referral</button>
+      <div class="menu-card" onclick="showScreen('scr-lf')">
+        <div class="card-icon">🔍</div><div class="card-title">Lost & Found</div><button class="card-btn">Daftar Laporan</button>
       </div>
     </div>
   </div>
@@ -118,8 +131,19 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
     <div id="map"></div>
     
     <div style="padding: 15px;">
-      <h3 style="font-weight: 800; font-size: 15px; margin-bottom:10px;">Daftar Pantauan Terkini</h3>
+      <h3 style="font-weight: 800; font-size: 15px; margin-bottom:10px; color:var(--navy);">Daftar Pantauan Terkini</h3>
       <div id="anabul-list"></div>
+    </div>
+  </div>
+
+  <div id="scr-lf" class="screen">
+    <div class="top-bar">
+      <button class="btn-back" onclick="showScreen('scr-home')">←</button>
+      <h2>Lost & Found</h2>
+    </div>
+    <div style="padding: 15px;">
+      <p style="font-size:13px; color:var(--muted); margin-bottom:15px;">Daftar anabul yang dilaporkan hilang atau ditemukan. Klik untuk melihat detail & update timeline.</p>
+      <div id="lf-list"></div>
     </div>
   </div>
 
@@ -130,19 +154,23 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
     </div>
     <div style="padding-top:20px;">
       <div class="form-group">
-        <label>Ambil Foto (Kamera Langsung)</label>
+        <label>Ambil Foto (Wajib Kamera)</label>
         <div style="border:2px dashed #DDD; border-radius:14px; padding:40px 10px; text-align:center; cursor:pointer; background:white;" onclick="document.getElementById('input-cam').click()">
           <span id="cam-hint" style="font-weight:800; color:var(--muted);">📷 Ketuk untuk memotret</span>
-          <img id="img-preview" style="display:none; width:100%; border-radius:12px;">
+          <img id="img-preview" style="display:none; width:100%; border-radius:12px; object-fit:cover; max-height:250px;">
         </div>
         <input type="file" id="input-cam" accept="image/*" capture="environment" style="display:none;" onchange="handleNativePhoto(this)">
       </div>
       <div class="form-group">
-        <label>Nama/Kondisi</label>
-        <input type="text" class="f-input" placeholder="Contoh: Kucing Luka di Margonda">
+        <label>Nama Anabul / Kondisi Singkat</label>
+        <input type="text" id="inp-nama" class="f-input" placeholder="Contoh: Kucing Luka di Margonda">
       </div>
       <div class="form-group">
-        <button class="btn-primary" onclick="alert('Laporan berhasil dikirim!'); showScreen('scr-peta');">Kirim Laporan 🐾</button>
+        <label>Lokasi / Patokan</label>
+        <input type="text" id="inp-lokasi" class="f-input" placeholder="Contoh: Depan Indomaret Margonda Raya">
+      </div>
+      <div class="form-group">
+        <button class="btn-primary" onclick="simpanLaporanBaru()">Kirim Laporan 🐾</button>
       </div>
     </div>
   </div>
@@ -159,175 +187,10 @@ body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
         <p style="font-size: 13px; color: var(--muted); margin-top:5px;" id="det-lokasi">📍 Lokasi</p>
         <button class="btn-primary" id="det-wa" style="background:var(--green); padding:12px; margin-top:15px; font-size:14px;">💬 Hubungi Pelapor</button>
       </div>
-      <button class="btn-primary" style="margin-top:0;" onclick="showScreen('scr-update')">+ Update Kondisi</button>
+      
+      <button class="btn-primary" style="margin-top:0; background:white; color:var(--orange); border:2px solid var(--orange);" onclick="showScreen('scr-update')">📝 + Update Kondisi</button>
+      
       <h4 style="font-weight: 800; color: var(--navy); font-size: 15px; margin-top:25px;">Riwayat Pantauan</h4>
       <div class="timeline" id="timeline-container"></div>
     </div>
   </div>
-
-  <div id="scr-update" class="screen">
-    <div class="top-bar">
-      <button class="btn-back" onclick="showScreen('scr-detail')">←</button>
-      <h2>Update Anabul</h2>
-    </div>
-    <div style="padding-top:20px;">
-      <div class="form-group">
-        <label>Kondisi Saat Ini</label>
-        <select id="upd-status" class="f-input">
-          <option value="terlihat">👀 Masih terlihat / Ada di lokasi</option>
-          <option value="hilang">❌ Tidak ditemukan / Pindah tempat</option>
-          <option value="aman">✅ Sudah aman / Diselamatkan</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Catatan Tambahan</label>
-        <textarea id="upd-catatan" class="f-input" rows="3" placeholder="Contoh: Saya cek tidak ada..."></textarea>
-      </div>
-      <div class="form-group">
-        <button class="btn-primary" onclick="simpanUpdate()">Kirim Update Kondisi</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="scr-profil" class="screen">
-    <div class="top-bar">
-      <button class="btn-back" onclick="showScreen('scr-home')">←</button>
-      <h2>Profil Ranger</h2>
-    </div>
-    <div style="padding:20px; text-align:center;">
-      <div style="font-size:60px; margin-bottom:10px;">👤</div>
-      <h3 style="font-weight:900; color:var(--navy);">Rizka Zamzani Ibrahim</h3>
-      <p style="font-size:14px; color:var(--muted);">Founder SIPA & Ketua RT 01</p>
-      <div style="background:#fffde7; border:1px dashed #fbc02d; border-radius:14px; padding:15px; margin-top:20px;">
-        <div style="font-size:12px; font-weight:800; color:#f57f17;">KODE REFERRAL KEISHAGLOW</div>
-        <div style="font-size:20px; font-weight:900; color:var(--navy); margin-top:5px;">SAPA-GLOW-01</div>
-      </div>
-    </div>
-  </div>
-
-  <div id="bottom-nav">
-    <div class="nav-item active" onclick="showScreen('scr-home')"><span class="ni">🏠</span>Beranda</div>
-    <div class="nav-item" onclick="showScreen('scr-peta')"><span class="ni">🗺️</span>Peta</div>
-    <div class="nav-item" onclick="showScreen('scr-lapor')"><span class="ni">📸</span>Lapor</div>
-    <div class="nav-item" onclick="showScreen('scr-profil')"><span class="ni">👤</span>Profil</div>
-  </div>
-
-</div>
-
-<script>
-/* --- DATA DUMMY --- */
-let dbData = [
-  { id: 1, nama: "Mimi (Kucing)", status: "hilang", emoji: "😿", lat: -6.2050, lng: 106.8120, lokasi: "Cilodong", wa: "628123456789", updates: [{ waktu: "10:00 WIB", user: "Pelapor Awal", teks: "Mimi lepas dari rumah.", tipe: "terlihat" }] },
-  { id: 2, nama: "Anjing Luka", status: "darurat", emoji: "🐕", lat: -6.2150, lng: 106.8100, lokasi: "Margonda", wa: "6289988776655", updates: [{ waktu: "15:30 WIB", user: "Budi", teks: "Pincang di minimarket.", tipe: "terlihat" }, { waktu: "18:00 WIB", user: "Andi", teks: "Sudah tidak ada.", tipe: "hilang" }] }
-];
-
-let currentId = null;
-
-/* --- LOGIKA NAVIGASI SPA --- */
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if(id === 'scr-home') document.querySelectorAll('.nav-item')[0].classList.add('active');
-  if(id === 'scr-peta' || id === 'scr-detail') { 
-      document.querySelectorAll('.nav-item')[1].classList.add('active'); 
-      if(map && id === 'scr-peta') setTimeout(()=>map.invalidateSize(),200); 
-  }
-  if(id === 'scr-lapor') document.querySelectorAll('.nav-item')[2].classList.add('active');
-  if(id === 'scr-profil') document.querySelectorAll('.nav-item')[3].classList.add('active');
-}
-
-/* --- LOGIKA PETA & LIST --- */
-let map; let markerLayer;
-function initMap() {
-  if (map) return;
-  try {
-    map = L.map('map', { zoomControl: false, preferCanvas: true }).setView([-6.2080, 106.8150], 14);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    markerLayer = L.layerGroup().addTo(map);
-    terapkanFilter('all');
-  } catch (e) { console.error("Map Load Error:", e); }
-}
-
-function terapkanFilter(kategori, btnEl = null) {
-  if (btnEl) {
-    document.querySelectorAll('.chip').forEach(btn => btn.classList.remove('on'));
-    btnEl.classList.add('on');
-  }
-  markerLayer.clearLayers();
-  
-  const list = document.getElementById('anabul-list');
-  list.innerHTML = "";
-  
-  dbData.forEach(item => {
-    if (kategori === 'all' || item.status === kategori) {
-      const icon = L.divIcon({ className: `custom-marker marker-${item.status}`, iconSize: [20, 20] });
-      L.marker([item.lat, item.lng], { icon: icon }).bindPopup(`<b>${item.nama}</b>`).addTo(markerLayer);
-      
-      const lastUpd = item.updates[item.updates.length - 1];
-      list.innerHTML += `
-        <div class="list-item" onclick="bukaDetail(${item.id})">
-          <div class="list-emoji">${item.emoji}</div>
-          <div style="flex:1;">
-            <div style="font-weight:800; font-size:14px; color:var(--navy);">${item.nama}</div>
-            <div style="font-size:11px; color:var(--muted); margin-top:2px;">📍 ${item.lokasi}</div>
-            <div style="font-size:11px; color:var(--orange); font-weight:700; margin-top:4px;">Upd: ${lastUpd.teks.substring(0,30)}...</div>
-          </div>
-        </div>
-      `;
-    }
-  });
-}
-
-/* --- LOGIKA DETAIL & UPDATE --- */
-function bukaDetail(id) {
-  currentId = id;
-  const item = dbData.find(a => a.id === id);
-  document.getElementById('det-img').textContent = item.emoji;
-  document.getElementById('det-nama').textContent = item.nama;
-  document.getElementById('det-lokasi').textContent = `📍 ${item.lokasi}`;
-  document.getElementById('det-wa').onclick = () => window.open(`https://wa.me/${item.wa.replace(/[^0-9]/g,"")}?text=Halo info SaPA`, '_blank');
-
-  const tl = document.getElementById('timeline-container');
-  tl.innerHTML = "";
-  [...item.updates].reverse().forEach(upd => {
-    let dotClass = "timeline-dot" + (upd.tipe === "hilang" ? " dot-gone" : (upd.tipe === "aman" ? " dot-safe" : ""));
-    tl.innerHTML += `
-      <div class="timeline-item">
-        <div class="${dotClass}"></div>
-        <div class="timeline-time">${upd.waktu}</div>
-        <div class="timeline-text">${upd.teks}</div>
-        <div style="font-size: 11px; color: var(--orange); font-weight: 700; margin-top: 4px;">👤 ${upd.user}</div>
-      </div>`;
-  });
-  showScreen('scr-detail');
-}
-
-function simpanUpdate() {
-  const cat = document.getElementById('upd-catatan').value;
-  if (!cat) { alert("Isi catatan dulu!"); return; }
-  const item = dbData.find(a => a.id === currentId);
-  item.updates.push({ waktu: "Baru saja", user: "Zachs", teks: cat, tipe: document.getElementById('upd-status').value });
-  document.getElementById('upd-catatan').value = "";
-  bukaDetail(currentId);
-  terapkanFilter('all');
-}
-
-/* --- LOGIKA KAMERA --- */
-function handleNativePhoto(input) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = e => { 
-      document.getElementById('img-preview').src = e.target.result; 
-      document.getElementById('img-preview').style.display = 'block'; 
-      document.getElementById('cam-hint').style.display = 'none'; 
-    }
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
-window.onload = () => { initMap(); };
-</script>
-</body>
-</html>
