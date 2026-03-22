@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>SaPA • Satu Peta Anabul | NgePaw Ranger</title>
+<title>SaPA • Satu Peta Anabul | Super-Engine V5</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <style>
-/* ── VARIABEL & RESET ── */
+/* ── UI/UX STANDAR V5 PREMIUM ── */
 :root {
   --orange: #F26522; --orange-l: #F5874F; --orange-bg: #FFF8F6;
   --blue: #42C0FB; --green: #25D366; --navy: #1a2340; --dark: #1A1A1A;
@@ -23,40 +23,278 @@
 * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; font-family:'Nunito',sans-serif; }
 body { background:#F5F5F5; color:var(--dark); overflow-x:hidden; }
 
-/* ── LAYOUT & ANIMASI ── */
-@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-.screen { display:none; min-height:100vh; background:#F5F5F5; padding-bottom:100px; }
-.screen.active { display:block; animation: fadeIn 0.3s ease-out; }
-.container { max-width:500px; margin:0 auto; background:var(--white); min-height:100vh; position:relative; box-shadow:0 0 30px rgba(0,0,0,0.06); }
+/* Animation & Screens */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.screen { display:none; min-height:100vh; background:#F5F5F5; padding-bottom:110px; }
+.screen.active { display:block; animation: fadeIn 0.4s ease; }
+.container { max-width:500px; margin:0 auto; background:var(--white); min-height:100vh; position:relative; box-shadow:0 0 50px rgba(0,0,0,0.1); }
 
-/* ── HEADER V4 ── */
-.app-header { background:linear-gradient(135deg, var(--navy), #0f1a2e); color:var(--white); text-align:center; padding:28px 20px 24px; border-bottom-left-radius:24px; border-bottom-right-radius:24px; }
-.header-logo-ring { width:80px; height:80px; margin:0 auto 12px; background:var(--white); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.25); font-size:40px; }
-.header-title { font-size:20px; font-weight:900; }
-.header-title span { color:var(--orange); }
-.status-pill { display:inline-block; background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:20px; font-size:10px; font-weight:800; margin-top:10px; }
+/* Header & Identity */
+.app-header { background:linear-gradient(135deg, var(--navy), #0f1a2e); color:var(--white); text-align:center; padding:35px 20px 30px; border-bottom-left-radius:30px; border-bottom-right-radius:30px; }
+.header-logo-ring { width:88px; height:88px; margin:0 auto 15px; background:var(--white); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 25px rgba(0,0,0,0.3); font-size:42px; border:3px solid var(--orange); }
+.header-title { font-size:22px; font-weight:900; }
+.header-title span { color:var(--orange-l); }
+.status-pill { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.1); padding:8px 16px; border-radius:25px; font-size:11px; font-weight:800; margin-top:12px; }
 
-/* ── TOP BAR ── */
-.top-bar { padding:16px 18px; display:flex; align-items:center; gap:14px; background:var(--white); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:1000; }
-.top-bar h2 { font-size:18px; font-weight:900; color:var(--navy); flex:1; }
-.btn-back { width:40px; height:40px; border-radius:12px; border:none; background:var(--orange-bg); color:var(--orange); font-size:22px; font-weight:900; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-
-/* ── STATS & MENU GRID (HOME) ── */
+/* Stats Strip */
 .stats-strip { display:grid; grid-template-columns:repeat(4,1fr); background:white; border-bottom:1px solid var(--border); }
-.stat-item { text-align:center; padding:12px 4px; border-right:1px solid var(--border); cursor:pointer; }
-.stat-val { font-size:18px; font-weight:900; }
-.stat-lbl { font-size:9px; font-weight:700; color:var(--muted); }
+.stat-item { text-align:center; padding:18px 5px; border-right:1px solid var(--border); }
+.stat-val { font-size:18px; font-weight:900; display:block; }
+.stat-lbl { font-size:9px; font-weight:800; color:var(--muted); text-transform:uppercase; margin-top:4px; }
 
-.menu-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:15px; }
-.menu-card { background:var(--white); border:1px solid var(--border); border-radius:18px; padding:16px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.02); cursor:pointer; }
-.menu-card.primary { grid-column:span 2; background:var(--orange); color:white; }
-.card-icon { font-size:32px; margin-bottom:8px; }
-.card-title { font-size:14px; font-weight:800; }
+/* Menu & Cards */
+.menu-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; padding:20px; }
+.menu-card { background:var(--white); border:1px solid var(--border); border-radius:22px; padding:20px; text-align:center; box-shadow:0 8px 20px rgba(0,0,0,0.04); cursor:pointer; }
+.menu-card.primary { grid-column:span 2; background:var(--orange); color:white; border-color:var(--orange); }
+.card-icon { font-size:38px; margin-bottom:10px; display:block; }
 
-/* ── LIST VIEW & PETA ── */
-#map { height:360px; width:100%; border-bottom:1px solid var(--border); z-index:1; }
-.list-item { background:white; border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; display:flex; gap:12px; align-items:center; cursor:pointer; }
-.list-emoji { font-size:30px; background:#f9f9f9; width:50px; height:50px; display:flex; align-items:center; justify-content:center; border-radius:12px; }
-.tag { padding:3px 8px; border-radius:6px; font-size:10px; font-weight:800; }
+/* Lists & Peta */
+#map { height:360px; width:100%; border-bottom:1px solid var(--border); }
+.chip-row { display:flex; gap:10px; padding:15px; overflow-x:auto; background:var(--white); border-bottom:1px solid var(--border); scrollbar-width:none; }
+.chip { padding:10px 20px; border-radius:25px; border:1.5px solid var(--border); font-size:12px; font-weight:800; color:var(--muted); cursor:pointer; white-space:nowrap; background:white; }
+.chip.on { background:var(--orange); color:white; border-color:var(--orange); }
 
-/* ──
+.list-item { background:white; border:1px solid var(--border); border-radius:18px; padding:15px; margin-bottom:12px; display:flex; gap:15px; align-items:center; cursor:pointer; }
+.list-emoji { font-size:32px; background:#F9FAFB; width:55px; height:55px; display:flex; align-items:center; justify-content:center; border-radius:15px; }
+
+/* Footer Partner */
+.collab-footer { padding:25px 20px; text-align:center; background:#FAFAFA; border-top:1px solid var(--border); }
+.collab-lbl { font-size:10px; font-weight:900; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:15px; }
+.collab-logos { display:flex; justify-content:center; gap:20px; flex-wrap:wrap; opacity:0.7; }
+.logo-item { font-size:12px; font-weight:900; color:var(--navy); background:white; padding:5px 12px; border-radius:10px; border:1px solid var(--border); }
+
+/* Navigation */
+#bottom-nav { position:fixed; bottom:0; width:100%; max-width:500px; background:white; display:flex; border-top:1px solid var(--border); z-index:1000; left:50%; transform:translateX(-50%); padding-bottom:env(safe-area-inset-bottom); box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
+.nav-item { flex:1; text-align:center; padding:12px 5px; font-size:10px; font-weight:800; color:var(--muted); cursor:pointer; }
+.nav-item.active { color:var(--orange); }
+.nav-item .ni { font-size:24px; display:block; margin-bottom:2px; }
+
+/* Leaderboard */
+.lb-item { display:flex; align-items:center; gap:15px; padding:12px; border-bottom:1px solid var(--border); }
+.lb-rank { width:30px; font-weight:900; color:var(--orange); font-size:18px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div id="scr-home" class="screen active">
+    <div class="app-header">
+      <div class="header-logo-ring">🐾</div>
+      <div class="header-title">Satu Peta <span>Anabul</span></div>
+      <div class="status-pill">
+        <span id="db-status-icon" style="color:var(--gold)">●</span> 
+        <span id="db-status-text">Menghubungkan...</span>
+      </div>
+    </div>
+
+    <div class="stats-strip">
+      <div class="stat-item"><span class="stat-val" id="count-animals">0</span><span class="stat-lbl">Anabul</span></div>
+      <div class="stat-item" onclick="showScreen('scr-komunitas')"><span class="stat-val" id="count-klinik">0</span><span class="stat-lbl">Klinik</span></div>
+      <div class="stat-item" onclick="showScreen('scr-komunitas')"><span class="stat-val" id="count-komunitas">0</span><span class="stat-lbl">Komunitas</span></div>
+      <div class="stat-item" onclick="showScreen('scr-poin')"><span class="stat-val" id="user-poin-hero" style="color:var(--orange)">0</span><span class="stat-lbl">Poinku</span></div>
+    </div>
+
+    <div class="menu-grid">
+      <div class="menu-card primary" onclick="showScreen('scr-peta')">
+        <span class="card-icon">🗺️</span><div style="font-weight:900">Peta Ranger Live</div>
+      </div>
+      <div class="menu-card" onclick="showScreen('scr-lapor')">
+        <span class="card-icon">🚨</span><div style="font-weight:900">Lapor Cepat</div>
+      </div>
+    </div>
+
+    <div style="padding:0 20px 20px;">
+      <h4 style="font-weight:900; margin-bottom:15px; display:flex; justify-content:space-between;">
+        🏆 Leaderboard Ranger <span style="color:var(--orange); font-size:12px;" onclick="showScreen('scr-poin')">Lihat Semua →</span>
+      </h4>
+      <div id="leaderboard-home" style="background:white; border-radius:18px; border:1px solid var(--border); overflow:hidden;"></div>
+    </div>
+
+    <div class="collab-footer">
+      <div class="collab-lbl">Supported & Partners</div>
+      <div class="collab-logos">
+        <div class="logo-item">KeishaGlow</div>
+        <div class="logo-item">Kemenkes RI</div>
+        <div class="logo-item">PDHI</div>
+        <div class="logo-item">Bvet Lampung</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="scr-peta" class="screen">
+    <div style="padding:15px; background:white; display:flex; align-items:center; gap:15px; border-bottom:1px solid var(--border);">
+      <button onclick="showScreen('scr-home')" style="border:none; background:none; font-size:22px;">←</button>
+      <h2 style="font-weight:900; font-size:18px;">Peta Ranger Live</h2>
+    </div>
+    <div class="chip-row">
+      <div class="chip on" onclick="terapkanFilter('all', this)">📍 Semua</div>
+      <div class="chip" onclick="terapkanFilter('darurat', this)">🚨 Darurat</div>
+      <div class="chip" onclick="terapkanFilter('hilang', this)">😿 Hilang</div>
+    </div>
+    <div id="map"></div>
+    <div style="padding:20px;" id="anabul-list"></div>
+  </div>
+
+  <div id="scr-lapor" class="screen">
+    <div style="padding:25px;">
+      <h2 style="font-weight:900; margin-bottom:20px;">Lapor Anabul Baru</h2>
+      <div style="border:3px dashed #DDD; border-radius:24px; padding:50px 20px; text-align:center; background:white; cursor:pointer; margin-bottom:20px;" onclick="document.getElementById('input-cam').click()">
+        <span id="cam-hint" style="font-weight:800; color:var(--muted);">📷 Ambil Foto Anabul</span>
+        <img id="img-preview" style="width:100%; border-radius:18px; display:none;">
+      </div>
+      <input type="file" id="input-cam" accept="image/*" capture="environment" style="display:none;" onchange="handleNativePhoto(this)">
+      <input type="text" id="inp-nama" style="width:100%; padding:18px; border-radius:16px; border:2px solid var(--border); margin-bottom:15px;" placeholder="Nama / Kondisi">
+      <input type="text" id="inp-lokasi" style="width:100%; padding:18px; border-radius:16px; border:2px solid var(--border); margin-bottom:20px;" placeholder="Lokasi (Patokan)">
+      <button onclick="simpanLaporan()" style="width:100%; background:var(--orange); color:white; padding:20px; border-radius:22px; border:none; font-weight:900; font-size:16px;">Kirim ke Database 🐾</button>
+    </div>
+  </div>
+
+  <div id="scr-komunitas" class="screen">
+    <div style="padding:20px;">
+      <h2 style="font-weight:900; margin-bottom:15px;">Komunitas & Medis</h2>
+      <div id="komunitas-content"></div>
+    </div>
+  </div>
+
+  <div id="scr-poin" class="screen">
+    <div style="background:linear-gradient(135deg, var(--navy), #2d3f6b); padding:50px 20px; color:white; text-align:center; border-bottom-left-radius:30px; border-bottom-right-radius:30px;">
+      <div style="font-size:14px; opacity:0.8;">POIN RANGER SAYA</div>
+      <div style="font-size:60px; font-weight:900; color:var(--gold);" id="user-poin-big">0</div>
+      <div style="background:rgba(255,255,255,0.2); display:inline-block; padding:8px 20px; border-radius:20px; font-weight:800;" id="user-level">Level --</div>
+    </div>
+    <div style="padding:20px;">
+      <h4 style="font-weight:900; margin-bottom:15px;">🏆 Leaderboard Global</h4>
+      <div id="leaderboard-full" style="background:white; border-radius:18px; border:1px solid var(--border);"></div>
+    </div>
+  </div>
+
+  <div id="bottom-nav">
+    <div class="nav-item active" onclick="showScreen('scr-home')"><span class="ni">🏠</span>Home</div>
+    <div class="nav-item" onclick="showScreen('scr-peta')"><span class="ni">🗺️</span>Peta</div>
+    <div class="nav-item" onclick="showScreen('scr-lapor')"><span class="ni">📸</span>Lapor</div>
+    <div class="nav-item" onclick="showScreen('scr-komunitas')"><span class="ni">🤝</span>Mitra</div>
+    <div class="nav-item" onclick="showScreen('scr-poin')"><span class="ni">🏆</span>Poin</div>
+  </div>
+</div>
+
+<script>
+/* ── 🔥 KONEKSI FIREBASE RIZKA ZAMZANI 🔥 ── */
+const firebaseConfig = {
+  apiKey: "AIzaSyCj_aZOIOuiZEM7LsDTEtU3Ri_kqcQ-Mtl",
+  authDomain: "sapa-database-96958.firebaseapp.com",
+  projectId: "sapa-database-96958",
+  storageBucket: "sapa-database-96958.firebasestorage.app",
+  messagingSenderId: "613533167320",
+  appId: "1:613533167320:web:c6730a0cb1dd63e35631aa"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Simulasi Identitas Zachs
+const MY_UID = "zachs_founder_001";
+let dbAnimals = [];
+let currentFilter = 'all';
+
+/* 🚀 1. SINKRONISASI ANIMALS (PETA LIVE) */
+db.collection("laporan").orderBy("timestamp", "desc").onSnapshot(snap => {
+  dbAnimals = [];
+  snap.forEach(doc => dbAnimals.push({id: doc.id, ...doc.data()}));
+  document.getElementById('count-animals').textContent = dbAnimals.length;
+  renderPeta();
+});
+
+/* 🚀 2. SINKRONISASI USER & POIN */
+db.collection("users").doc(MY_UID).onSnapshot(doc => {
+  if(doc.exists()) {
+    const u = doc.data();
+    document.getElementById('user-poin-hero').textContent = u.poin || 0;
+    document.getElementById('user-poin-big').textContent = u.poin || 0;
+    document.getElementById('user-level').textContent = `Level ${u.level || 1} Ranger`;
+  } else {
+    db.collection("users").doc(MY_UID).set({ nama: "Zachs (Founder)", poin: 1240, level: 3 });
+  }
+});
+
+/* 🚀 3. SINKRONISASI LEADERBOARD */
+db.collection("users").orderBy("poin", "desc").limit(5).onSnapshot(snap => {
+  const lbHome = document.getElementById('leaderboard-home');
+  const lbFull = document.getElementById('leaderboard-full');
+  lbHome.innerHTML = ""; lbFull.innerHTML = "";
+  snap.forEach((doc, i) => {
+    const u = doc.data();
+    const html = `<div class="lb-item"><span class="lb-rank">${i+1}</span><div style="flex:1"><b>${u.nama}</b></div><div style="font-weight:900; color:var(--orange)">${u.poin} pts</div></div>`;
+    lbHome.innerHTML += html; lbFull.innerHTML += html;
+  });
+});
+
+/* 🚀 4. SINKRONISASI MITRA (KLINIK & KOMUNITAS) */
+db.collection("klinik").onSnapshot(snap => { document.getElementById('count-klinik').textContent = snap.size; });
+db.collection("komunitas").onSnapshot(snap => { document.getElementById('count-komunitas').textContent = snap.size; });
+
+/* ── LOGIKA APLIKASI ── */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if(id==='scr-home') document.querySelectorAll('.nav-item')[0].classList.add('active');
+  if(id==='scr-peta') { document.querySelectorAll('.nav-item')[1].classList.add('active'); if(map) setTimeout(()=>map.invalidateSize(),200); }
+  if(id==='scr-lapor') document.querySelectorAll('.nav-item')[2].classList.add('active');
+  if(id==='scr-komunitas') document.querySelectorAll('.nav-item')[3].classList.add('active');
+  if(id==='scr-poin') document.querySelectorAll('.nav-item')[4].classList.add('active');
+}
+
+let map; let markerLayer;
+function initMap() {
+  map = L.map('map', { zoomControl: false, preferCanvas: true }).setView([-6.3813, 106.8340], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  markerLayer = L.layerGroup().addTo(map);
+}
+
+function renderPeta() {
+  if(!markerLayer) return;
+  markerLayer.clearLayers();
+  const list = document.getElementById('anabul-list');
+  list.innerHTML = "";
+  dbAnimals.forEach(item => {
+    if(currentFilter === 'all' || item.status === currentFilter) {
+      L.marker([item.lat, item.lng]).addTo(markerLayer);
+      list.innerHTML += `<div class="list-item"><div class="list-emoji">🐾</div><div style="flex:1"><b>${item.nama}</b><br><small>📍 ${item.lokasi}</small></div></div>`;
+    }
+  });
+}
+
+function simpanLaporan() {
+  const nama = document.getElementById('inp-nama').value;
+  if(!nama) return alert("Isi nama dulu!");
+  db.collection("laporan").add({
+    nama: nama, lokasi: document.getElementById('inp-lokasi').value,
+    status: "darurat", lat: -6.38 + (Math.random()*0.02), lng: 106.83 + (Math.random()*0.02),
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    uid: MY_UID
+  }).then(() => {
+    // Tambah Poin User
+    db.collection("users").doc(MY_UID).update({ poin: firebase.firestore.FieldValue.increment(20) });
+    showScreen('scr-peta');
+  });
+}
+
+function handleNativePhoto(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => { 
+      document.getElementById('img-preview').src = e.target.result; 
+      document.getElementById('img-preview').style.display = 'block'; 
+      document.getElementById('cam-hint').style.display = 'none'; 
+    }
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+window.onload = () => { 
+  initMap(); 
+  document.getElementById('db-status-text').textContent = "Terhubung Live";
+  document.getElementById('db-status-icon').style.color = "#25D366";
+};
+</script>
+</body>
+</html>
